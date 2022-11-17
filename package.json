@@ -1,0 +1,14 @@
+{
+    "name": "shooter",
+    "version": "1.0.0",
+    "description": "shooter game",
+    "main": "server.js",
+    "scripts": {
+        "run": "node server.js"
+    },
+    "author": "Lucas Rouret",
+    "license": "ISC",
+    "dependencies": {
+        "express": "^4.18.2"
+    }
+}
