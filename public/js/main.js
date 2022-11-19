@@ -1,3 +1,4 @@
+const socket = io();
 const canvas = document.getElementById("app");
 const ctx = canvas.getContext("2d");
 const FPS = 30;

@@ -6,13 +6,24 @@
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
     <title>Shooter</title>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
-    <link rel='stylesheet' type='text/css' media='screen' href='css/main.css'>
 </head>
 
 <body>
+    <style type="text/css">
+        * {
+            padding: 0;
+            margin: 0;
+        }
+        
+        html,
+        body {
+            height: 100%;
+            overflow: hidden;
+        }
+    </style>
     <canvas id="app"></canvas>
-
-    <script src='js/main.js' type="module"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="js/main.js"></script>
 </body>
 
 </html>
