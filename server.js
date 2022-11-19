@@ -12,7 +12,6 @@ const PUBLIC_FOLDER = "public";
 const VIEWS_FOLDER = "views";
 
 var players = [];
-var bullets = [];
 
 app.use(express.static(path.join(__dirname, PUBLIC_FOLDER)));
 
@@ -29,6 +28,24 @@ io.on('connection', (socket) => {
 
     //send the players object to the new player
     io.emit('update', { players: players });
+
+    socket.on('moving', (playerMouvementInformation) => {
+        console.log(`Player ${socket.id} is moving : (${playerMouvementInformation.x},${playerMouvementInformation.x})`);
+
+        var vector = {
+            x: playerMouvementInformation.x - currentPlayer.x,
+            y: playerMouvementInformation.y - currentPlayer.y
+        }
+        var distance = Math.sqrt(vector.x * vector.x + vector.y * vector.y)
+
+        var coef = distance / currentPlayer.speed;
+        if (coef > 1) {
+            currentPlayer.x += vector.x * (1 / coef)
+            currentPlayer.y += vector.y * (1 / coef)
+        }
+
+        io.emit('update', { players: players });
+    });
 
     socket.on('disconnect', () => {
         players = players.filter(p => p.id !== socket.id);

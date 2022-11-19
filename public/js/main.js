@@ -6,17 +6,41 @@ const timePerTick = 1000 / FPS;
 
 //GAME SETUP
 const BACKGROUND_COLOR = "#999999"
+const PLAYER_SIZE = 30;
+//from the server
 var gameState = {
-    needToDraw: false,
-    players: []
+        needToDraw: false,
+        players: []
+    }
+    //local mouse position
+var mouse = {
+    current: {
+        x: 0,
+        y: 0
+    },
+    previous: {
+        x: 0,
+        y: 0
+    }
 }
 
 //SETUP
 canvas.width = document.body.clientWidth;
 canvas.height = document.body.clientHeight;
 
-//IO
+//Detect mouse movement
+canvas.addEventListener('mousemove', function(event) {
+    mouse.current.x = event.clientX;
+    mouse.current.y = event.clientY;
 
+
+    if (mouse.current.x != mouse.previous.x || mouse.current.y != mouse.previous.y) {
+        socket.emit("moving", mouse.current);
+        mouse.previous = {...mouse.current };
+    }
+}, false);
+
+//IO
 socket.on("update", (gameStateFromServer) => {
     gameState = {...gameStateFromServer };
     gameState.needToDraw = true;
@@ -25,12 +49,11 @@ socket.on("update", (gameStateFromServer) => {
 //Canvas
 function drawPlayer(player) {
     ctx.fillStyle = player.color;
-    ctx.fillRect(player.x, player.y, 30, 30);
+    ctx.fillRect(player.x - (PLAYER_SIZE / 2), player.y - (PLAYER_SIZE / 2), PLAYER_SIZE, PLAYER_SIZE);
 }
 
 function draw() {
     if (gameState.needToDraw) {
-        console.log("Drawing");
         // clear canvas
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         // draw background
