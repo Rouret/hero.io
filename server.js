@@ -10,7 +10,6 @@ const PORT = process.env.PORT || 3000;
 const PUBLIC_FOLDER = "public";
 const VIEWS_FOLDER = "views";
 
-
 app.use(express.static(path.join(__dirname, PUBLIC_FOLDER)));
 
 app.get('/', (req, res) => {
