@@ -16,8 +16,7 @@ For players:<br>
 For developers:<br>
 server side:<br>
 [Y] - server can manage multiple players connexion/disconnexion <br>
-[KO] - server can manage multiple players movement<br>
-"Currently, the gamestate is only sent if players are moving. So if nobody is moving, the players stop and so the vector calc doenst work "<br><br>
+[Y] - server can manage multiple players movement<br>
 [Y] - the server send game state to the client when it changes <br>
 
 client side:<br>

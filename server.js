@@ -30,21 +30,7 @@ io.on('connection', (socket) => {
     io.emit('update', { players: players });
 
     socket.on('moving', (playerMouvementInformation) => {
-        console.log(`Player ${socket.id} is moving : (${playerMouvementInformation.x},${playerMouvementInformation.x})`);
-
-        var vector = {
-            x: playerMouvementInformation.x - currentPlayer.x,
-            y: playerMouvementInformation.y - currentPlayer.y
-        }
-        var distance = Math.sqrt(vector.x * vector.x + vector.y * vector.y)
-
-        var coef = distance / currentPlayer.speed;
-        if (coef > 1) {
-            currentPlayer.x += vector.x * (1 / coef)
-            currentPlayer.y += vector.y * (1 / coef)
-        }
-
-        io.emit('update', { players: players });
+        currentPlayer.mouse = playerMouvementInformation;
     });
 
     socket.on('disconnect', () => {
@@ -52,6 +38,25 @@ io.on('connection', (socket) => {
         console.log(`Player disconnected: ${socket.id}, current players: ${players.length}`);
     });
 });
+
+var int = setInterval(() => {
+    if (players.length == 0) return;
+    players.forEach(player => {
+        var vector = {
+            x: player.mouse.x - player.x,
+            y: player.mouse.y - player.y
+        }
+        var distance = Math.sqrt(vector.x * vector.x + vector.y * vector.y)
+
+        var coef = distance / player.speed;
+
+        if (coef > 1) {
+            player.x += vector.x / coef;
+            player.y += vector.y / coef;
+        }
+    });
+    io.emit('update', { players: players });
+}, 30 / 1000);
 
 server.listen(PORT, () => {
     console.log(`listening on *:${PORT}`);
