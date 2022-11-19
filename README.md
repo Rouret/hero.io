@@ -10,7 +10,7 @@ By Lucas Rouret.
 ### V0.1.1
 
 For players:<br>
-[❌] - player can shoot<br>
+[〰️] - player can shoot<br>
 [❌] - player can score<br>
 
 

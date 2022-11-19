@@ -40,6 +40,11 @@ canvas.addEventListener('mousemove', function(event) {
     }
 }, false);
 
+//detect click
+canvas.addEventListener('click', function(event) {
+    socket.emit("shoot", { x: event.clientX, y: event.clientY });
+}, false);
+
 //IO
 socket.on("update", (gameStateFromServer) => {
     gameState = {...gameStateFromServer };
@@ -52,6 +57,11 @@ function drawPlayer(player) {
     ctx.fillRect(player.x - (PLAYER_SIZE / 2), player.y - (PLAYER_SIZE / 2), PLAYER_SIZE, PLAYER_SIZE);
 }
 
+function drawBullet(bullet) {
+    ctx.fillStyle = "black";
+    ctx.fillRect(bullet.current.x - 2, bullet.current.y - 2, 10, 10);
+}
+
 function draw() {
     if (gameState.needToDraw) {
         // clear canvas
@@ -62,6 +72,9 @@ function draw() {
 
         // draw players
         gameState.players.forEach(drawPlayer)
+
+        //draw bullets
+        gameState.bullets.forEach(drawBullet)
 
         gameState.needToDraw = false;
     }
