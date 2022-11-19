@@ -15,7 +15,7 @@ For players:<br>
 
 For developers:<br>
 server side:<br>
-[X] - server can manage multiple players connexion/disconnexion <br>
+[Y] - server can manage multiple players connexion/disconnexion <br>
 [X] - server can manage multiple players movement<br>
 [X] - the server send game state to the client when it changes <br>
 
