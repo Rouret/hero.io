@@ -24,7 +24,12 @@ io.on('connection', (socket) => {
     //create a new player and add it to our players array
     var currentPlayer = new Player(socket.id);
     players.push(currentPlayer);
+
     console.log(`New player connected: ${socket.id}, current players: ${players.length}`);
+
+    //send the players object to the new player
+    io.emit('update', { players: players });
+
     socket.on('disconnect', () => {
         players = players.filter(p => p.id !== socket.id);
         console.log(`Player disconnected: ${socket.id}, current players: ${players.length}`);
