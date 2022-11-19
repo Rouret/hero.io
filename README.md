@@ -2,10 +2,10 @@ Shooter game, with socket.io and node.js.
 
 By Lucas Rouret.
 
-[X] -> No started yet.
-[~] -> Started.
-[KO] -> Fucking bugs.
-[Y] -> Finished.
+[X] -> No started yet.<br>
+[~] -> Started.<br>
+[KO] -> Bugs O_o.<br>
+[Y] -> Finished.<br>
 
 ### V0.1.0
 
