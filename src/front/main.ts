@@ -47,8 +47,12 @@ let mouse = {
 };
 
 const elButton: HTMLButtonElement = document.getElementById('start') as HTMLButtonElement;
-
 elButton.addEventListener('click', goLesFumer);
+elName.addEventListener("keyup", ({key}) => {
+  if (key === "Enter") {
+    goLesFumer();
+  }
+})
 
 function goLesFumer() {
   username = elName.value;

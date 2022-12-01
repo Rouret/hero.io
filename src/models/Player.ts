@@ -19,7 +19,7 @@ export default class Player {
     this.color = color;
     this.coordinate = new Coordinate(0, 0);
     this.mouse = new Coordinate(0, 0);
-    this.speed = 2;
+    this.speed = 3;
     this.score = 0;
     this.size = 25;
     this.clientDim = {
@@ -60,7 +60,6 @@ export default class Player {
   }
 
   setEffect(effect) {
-    console.log("OUI")
     this.effect = effect;
 
     switch (effect) {
