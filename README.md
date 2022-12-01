@@ -9,7 +9,7 @@ By Lucas Rouret.
 
 ### V0.1.2
 
-[〰️] - player can have a name and custom color<br>
+[✔️] - player can have a name and custom color<br>
 
 ### V0.1.1
 

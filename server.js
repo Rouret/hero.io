@@ -14,7 +14,7 @@ const {
   minScreenSize,
 } = require("./utils");
 
-const PORT = process.env.PORT || 8081;
+const PORT = process.env.PORT || 8080;
 const PUBLIC_FOLDER = "public";
 const VIEWS_FOLDER = "views";
 
@@ -36,7 +36,7 @@ io.on("connection", (socket) => {
     currentPlayer = new Player(
       socket.id,
       data.window,
-      data.name.slice(0, 10),
+      data.name.slice(0, 15),
       data.color
     );
     players.push(currentPlayer);

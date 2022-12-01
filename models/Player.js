@@ -9,7 +9,7 @@ class Player {
       x: 0,
       y: 0,
     };
-    this.speed = 3;
+    this.speed = 2;
     this.score = 0;
     this.size = 25;
     this.clientDim = {

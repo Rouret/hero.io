@@ -50,7 +50,7 @@ function drawPlayer(player) {
   );
 
   ctx.fillStyle = "#000000";
-  ctx.font = "10px Arial";
+  ctx.font = "15px Arial";
   ctx.fillText(
     player.name,
     player.x - player.size / 1.9,
