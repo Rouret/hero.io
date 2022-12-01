@@ -15,6 +15,16 @@ function random(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
+function randomPosOnScreen(players) {
+  //TODO A enlever avec la map dynamique
+  let min = minScreenSize(players);
+  return {
+    x: random(
+        0, min.width),
+    y: random(0, min.height)
+  }
+}
+
 function minScreenSize(players) {
   let width = 0;
   let height = 0;
@@ -28,9 +38,15 @@ function minScreenSize(players) {
   };
 }
 
+function getRandomColor() {
+    return "#" + Math.floor(Math.random() * 16777215).toString(16);
+}
+
 module.exports = {
   calcVector,
   getDistanceOfVector,
   random,
+  randomPosOnScreen,
   minScreenSize,
+  getRandomColor,
 };

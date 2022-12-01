@@ -1,10 +1,16 @@
 const Player = require("./Player");
 const Bullet = require("./Bullet");
 
+const { randomPosOnScreen, getRandomColor,
+} = require("../utils");
+const Boost = require("./Boost");
+const { getRandomBoostType} = require("./BoostTypes");
+
 class Game {
   constructor() {
     this.players = [];
     this.bullets = [];
+    this.boosts = [];
   }
 
   addPlayer(id, window, name, color) {
@@ -17,6 +23,11 @@ class Game {
   addBullet(currentX, currentY, endX, endY, player) {
     let bullet = new Bullet(currentX, currentY, endX, endY, player);
     this.bullets.push(bullet);
+  }
+
+  addBoost(window) {
+    let boost = new Boost(1, window, getRandomBoostType(), getRandomColor(), randomPosOnScreen(this.players));
+    this.boosts.push(boost);
   }
 
   filterBullet() {

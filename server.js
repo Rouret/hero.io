@@ -10,7 +10,7 @@ const {
   calcVector,
   getDistanceOfVector,
   random,
-  minScreenSize,
+  minScreenSize, randomPosOnScreen,
 } = require("./utils");
 
 const PORT = process.env.PORT || 8080;
@@ -97,10 +97,9 @@ setInterval(() => {
 
       game.players.find((p) => p.id !== playerId).score++;
 
-      //TODO A enlever avec la map dynamique
-      let min = minScreenSize(game.players);
-      player.x = random(0, min.width);
-      player.y = random(0, min.height);
+      let randomCoords = randomPosOnScreen(game.players);
+      player.x = randomCoords.x;
+      player.y = randomCoords.y;
     }
 
     let vector = calcVector(player.x, player.y, player.mouse.x, player.mouse.y);

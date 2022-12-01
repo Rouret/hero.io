@@ -1,3 +1,5 @@
+const {BoostTypes} = require("./BoostTypes");
+
 class Player {
   constructor(id, window, name, color) {
     this.id = id;
@@ -16,6 +18,7 @@ class Player {
       width: window.width,
       height: window.height,
     };
+    this.effect = null;
   }
 
   isCollidingWith(bullets) {
@@ -31,6 +34,22 @@ class Player {
       }
     }
     return null;
+  }
+  setEffect(effect) {
+    this.effect = effect;
+
+    switch (effect) {
+        case BoostTypes.SPEED:
+            this.speed = 5;
+    }
+  }
+
+  removeEffect() {
+    switch (this.effect) {
+      case BoostTypes.SPEED:
+        this.speed = 2;
+    }
+    this.effect = null;
   }
 }
 
