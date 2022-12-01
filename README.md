@@ -22,6 +22,21 @@ npm run start
 
 Front-end assets won't be updated while the dev server is running, coming soon with Webpack Dev Server.
 
+### Ideas
+
+- Une map plus grande avec des obstacle
+- Système de caméra dynamique 
+- Système d'arme
+- Vie / Shield
+- Spawn de joueur 
+- Spawn d'arme
+
+
+### V0.1.4 (rc-1)
+
+[❌] -> ajout de nouveaux boostes avec des effets <br>
+[❌] -> design des players, bullets et boosts <br>
+
 ### V0.1.3 (rc-1)
 
 [✔️] -> added TypeScript suppport <br>
