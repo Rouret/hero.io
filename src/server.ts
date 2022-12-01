@@ -132,7 +132,7 @@ setInterval(() => {
     boostTimer = 0;
   }
   io.emit("update", { players: game.players, bullets: game.bullets, boosts: game.boosts });
-}, TICK_RATE / 1000);
+}, 1000 / TICK_RATE);
 
 server.listen(PORT, () => {
   console.log(`listening on *:${PORT}`);
