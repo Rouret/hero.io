@@ -1,7 +1,8 @@
 class Player {
-  constructor(id, window, name) {
+  constructor(id, window, name, color) {
     this.id = id;
     this.name = name;
+    this.color = color;
     this.x = 0;
     this.y = 0;
     this.mouse = {

@@ -33,7 +33,7 @@ io.on("connection", (socket) => {
   // Avant de commencer le client envoie des meta donnéess
   socket.on("init", (data) => {
     console.log(data);
-    currentPlayer = new Player(socket.id, data.window, data.name);
+    currentPlayer = new Player(socket.id, data.window, data.name, data.color);
     players.push(currentPlayer);
   });
   //On envoye au client ses données

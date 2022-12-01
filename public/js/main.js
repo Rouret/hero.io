@@ -8,6 +8,8 @@ const timePerTick = 1000 / FPS;
 const BACKGROUND_COLOR = "#fff";
 let currentPlayer = {};
 let username;
+let color = "#" + Math.floor(Math.random() * 16777215).toString(16);
+document.getElementById("color").value = color;
 //from the server
 let gameState = {
   needToDraw: false,
@@ -27,6 +29,7 @@ let mouse = {
 
 function goLesFumer() {
   username = document.getElementById("name").value;
+  color = document.getElementById("color").value;
 
   if (username.length === 0) {
     username = "LE GROS CON";
@@ -132,6 +135,7 @@ function init() {
       height: canvas.height,
     },
     name: username,
+    color: color,
   });
 
   socket.on("newPlayer", (player) => {
