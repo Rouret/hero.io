@@ -14,6 +14,7 @@ const {
 } = require("./utils");
 
 const PORT = process.env.PORT || 8080;
+const TICK_RATE = 60;
 const PUBLIC_FOLDER = "public";
 const VIEWS_FOLDER = "views";
 
@@ -116,7 +117,7 @@ setInterval(() => {
     }
   });
   io.emit("update", { players: game.players, bullets: game.bullets });
-}, 30 / 1000);
+}, TICK_RATE / 1000);
 
 server.listen(PORT, () => {
   console.log(`listening on *:${PORT}`);
