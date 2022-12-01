@@ -5,8 +5,9 @@ const FPS = 30;
 const timePerTick = 1000 / FPS;
 
 //GAME SETUP
-const BACKGROUND_COLOR = "#999999";
+const BACKGROUND_COLOR = "#fff";
 let currentPlayer = {};
+let username;
 //from the server
 let gameState = {
   needToDraw: false,
@@ -24,54 +25,17 @@ let mouse = {
   },
 };
 
-//SETUP
-canvas.width = document.body.clientWidth;
-canvas.height = document.body.clientHeight;
+function goLesFumer() {
+  username = document.getElementById("name").value;
 
-//Detect mouse movement
-canvas.addEventListener(
-  "mousemove",
-  function (event) {
-    mouse.current.x = event.clientX;
-    mouse.current.y = event.clientY;
+  if (username.length === 0) {
+    username = "LE GROS CON";
+  }
+  document.getElementById("landing").style.display = "none";
+  document.getElementById("app").style.display = "block";
 
-    if (
-      mouse.current.x !== mouse.previous.x ||
-      mouse.current.y !== mouse.previous.y
-    ) {
-      socket.emit("moving", mouse.current);
-      mouse.previous = { ...mouse.current };
-    }
-  },
-  false
-);
-
-//detect click
-canvas.addEventListener(
-  "click",
-  function (event) {
-    socket.emit("shoot", { x: event.clientX, y: event.clientY });
-  },
-  false
-);
-
-//IO
-socket.emit("init", {
-  window: {
-    width: canvas.width,
-    height: canvas.height,
-  },
-});
-
-socket.on("newPlayer", (player) => {
-  currentPlayer = { ...player };
-});
-
-socket.on("update", (gameStateFromServer) => {
-  gameState = { ...gameStateFromServer };
-  gameState.needToDraw = true;
-});
-
+  init();
+}
 //Canvas
 function drawPlayer(player) {
   ctx.fillStyle = player.color;
@@ -82,15 +46,13 @@ function drawPlayer(player) {
     player.size
   );
 
-  if (player.id === currentPlayer.id) {
-    ctx.fillStyle = "#000000";
-    ctx.font = "20px Arial";
-    ctx.fillText(
-      "You",
-      player.x - currentPlayer.size / 1.9,
-      player.y + currentPlayer.size
-    );
-  }
+  ctx.fillStyle = "#000000";
+  ctx.font = "10px Arial";
+  ctx.fillText(
+    player.name,
+    player.x - player.size / 1.9,
+    player.y + player.size
+  );
 }
 
 function drawBullet(bullet) {
@@ -105,7 +67,7 @@ function drawLeaderboard() {
   ctx.font = "20px Arial";
   gameState.players.forEach((player, index) => {
     ctx.fillText(
-      `${index + 1}. ${player.id}: ${player.score}`,
+      `${index + 1}. ${player.name}: ${player.score}`,
       10,
       80 + index * 30
     );
@@ -132,7 +94,57 @@ function draw() {
   }
 }
 
-if (canvas.getContext) {
-  console.log("Game is ready 😊");
-  setInterval(draw, timePerTick);
+function init() {
+  //SETUP
+  canvas.width = window.document.documentElement.clientWidth;
+  canvas.height = window.document.documentElement.clientHeight - 1;
+  //Detect mouse movement
+  canvas.addEventListener(
+    "mousemove",
+    function (event) {
+      mouse.current.x = event.clientX;
+      mouse.current.y = event.clientY;
+
+      if (
+        mouse.current.x !== mouse.previous.x ||
+        mouse.current.y !== mouse.previous.y
+      ) {
+        socket.emit("moving", mouse.current);
+        mouse.previous = { ...mouse.current };
+      }
+    },
+    false
+  );
+
+  //detect click
+  canvas.addEventListener(
+    "click",
+    function (event) {
+      socket.emit("shoot", { x: event.clientX, y: event.clientY });
+    },
+    false
+  );
+
+  //IO
+  socket.emit("init", {
+    window: {
+      width: canvas.width,
+      height: canvas.height,
+    },
+    name: username,
+  });
+
+  socket.on("newPlayer", (player) => {
+    currentPlayer = { ...player };
+  });
+
+  socket.on("update", (gameStateFromServer) => {
+    gameState = { ...gameStateFromServer };
+    gameState.needToDraw = true;
+  });
+
+  if (canvas.getContext) {
+    console.log("Game is ready 😊");
+    setInterval(draw, timePerTick);
+  }
 }

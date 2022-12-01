@@ -1,6 +1,7 @@
 class Player {
-  constructor(id, window) {
+  constructor(id, window, name) {
     this.id = id;
+    this.name = name;
     this.x = 0;
     this.y = 0;
     this.mouse = {
@@ -8,7 +9,7 @@ class Player {
       y: 0,
     };
     this.color = "#" + Math.floor(Math.random() * 16777215).toString(16);
-    this.speed = 1;
+    this.speed = 2;
     this.score = 0;
     this.size = 30;
     this.clientDim = {

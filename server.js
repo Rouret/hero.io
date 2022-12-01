@@ -32,8 +32,8 @@ io.on("connection", (socket) => {
   let currentPlayer;
   // Avant de commencer le client envoie des meta donnéess
   socket.on("init", (data) => {
-    currentPlayer = new Player(socket.id, data.window);
-    console.log(currentPlayer);
+    console.log(data);
+    currentPlayer = new Player(socket.id, data.window, data.name);
     players.push(currentPlayer);
   });
   //On envoye au client ses données

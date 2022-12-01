@@ -7,12 +7,14 @@ By Lucas Rouret.
 [❗] -> Bugs O_o.<br>
 [✔️] -> Finished.<br>
 
+### V0.1.2
+
+[〰️] - player can have a name and custom color<br>
+
 ### V0.1.1
 
-For players:<br>
-[〰️] - player can shoot<br>
-[❌] - player can score<br>
-
+[✔️] - player can shoot<br>
+[✔️] - player can score<br>
 
 ### V0.1.0
 
@@ -30,4 +32,3 @@ client side:<br>
 [✔️] - the client send the mouse position to the server<br>
 [✔️] - the client receive the game state from the server<br>
 [✔️] - the client draw the game state<br>
-
