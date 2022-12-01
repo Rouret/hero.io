@@ -19,35 +19,124 @@
             display: none;
         }
 
+        .box {
+
+            border: 1px solid black;
+            box-shadow: 0 0 10px black;
+            padding: 30px;
+
+            background: #fff;
+        }
+
         #landing {
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            position: absolute;
+            background: linear-gradient(124deg, #d11919, #ffa500, #fef9c9, #9be292, #94c05b, #409072, #05a9ab, #004f99);
+            background-size: 1800% 1800%;
+
+            -webkit-animation: rainbow 40s ease infinite;
+            -z-animation: rainbow 40s ease infinite;
+            -o-animation: rainbow 40s ease infinite;
+            animation: rainbow 40s ease infinite;
             width: 100vw;
             height: 100vh;
 
             display: flex;
-            justify-content: center;
+            justify-content: space-around;
             align-items: center;
+
+            flex-direction: row;
         }
+
+
+        @-webkit-keyframes rainbow {
+            0% {
+                background-position: 0% 82%
+            }
+
+            50% {
+                background-position: 100% 19%
+            }
+
+            100% {
+                background-position: 0% 82%
+            }
+        }
+
+        @-moz-keyframes rainbow {
+            0% {
+                background-position: 0% 82%
+            }
+
+            50% {
+                background-position: 100% 19%
+            }
+
+            100% {
+                background-position: 0% 82%
+            }
+        }
+
+        @-o-keyframes rainbow {
+            0% {
+                background-position: 0% 82%
+            }
+
+            50% {
+                background-position: 100% 19%
+            }
+
+            100% {
+                background-position: 0% 82%
+            }
+        }
+
+        @keyframes rainbow {
+            0% {
+                background-position: 0% 82%
+            }
+
+            50% {
+                background-position: 100% 19%
+            }
+
+            100% {
+                background-position: 0% 82%
+            }
+        }
+
 
         #landing-content {
             display: flex;
             flex-direction: column;
 
-            border: 1px solid black;
-            box-shadow: 0 0 10px black;
-            padding: 10px;
         }
 
-        #landing-content * {
-            margin-bottom: 7px;
+        .mb-2 {
+            margin-bottom: 20px;
         }
     </style>
     <canvas id="app"></canvas>
     <div id="landing">
-        <div id="landing-content">
+
+        <div id="patch" class="box">
+            Patch 0.1.2<br>
+            <p>+ peut choisir son pseudo et couleur</p>
+        </div>
+        <div id="landing-content" class="box">
             <h1>Shooter</h1>
+            <span class="mb-2">By Lucas</span>
             <input type="text" id="name" placeholder="Entre ton nom salope" autocomplete="off">
-            <input type="color" id="color" value="#000000">
+            <input type="color" id="color" value="#000000" class="mb-2">
             <button id="start" onclick="goLesFumer()">Go tous les fumer</button>
+        </div>
+        <div id="settings" class="box">
+            Commandes<br>
+            <p> - souris : Déplacement</p>
+            <p> - click gauche : Tirer</p>
         </div>
 
     </div>
