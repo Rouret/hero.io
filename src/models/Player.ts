@@ -1,6 +1,18 @@
 const {BoostTypes} = require("./BoostTypes");
 
-class Player {
+export default class Player {
+  id: any;
+  name: string;
+  color: any;
+  x: number;
+  y: number;
+  mouse: any;
+  speed: number;
+  score: number;
+  size: number;
+  clientDim: any;
+  effect: any;
+
   constructor(id, window, name, color) {
     this.id = id;
     this.name = name;
@@ -68,5 +80,3 @@ class Player {
     this.effect = null;
   }
 }
-
-module.exports = Player;

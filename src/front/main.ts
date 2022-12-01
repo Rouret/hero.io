@@ -1,19 +1,42 @@
+import io from 'socket.io-client';
 const socket = io();
-const canvas = document.getElementById("app");
-const ctx = canvas.getContext("2d");
+const canvas: HTMLCanvasElement = document.getElementById("app") as HTMLCanvasElement;
+const ctx: CanvasRenderingContext2D = canvas.getContext("2d")!!;
 const FPS = 60;
 const timePerTick = 1000 / FPS;
 
+type Player = {
+  name: string;
+  score: number;
+}
+
+type GameState = {
+  needToDraw: boolean;
+  players: Player[];
+  bullets: [];
+  boosts: [];
+}
+
 //GAME SETUP
 const BACKGROUND_COLOR = "#fff";
-let currentPlayer = {};
+let currentPlayer: Player = {
+  name: '',
+  score: 0
+};
 let username;
 let color = "#" + Math.floor(Math.random() * 16777215).toString(16);
-document.getElementById("color").value = color;
+
+const elColor: HTMLInputElement = document.getElementById('color') as HTMLInputElement;
+const elName: HTMLInputElement = document.getElementById("name") as HTMLInputElement;
+const elLanding: HTMLDivElement = document.getElementById("landing") as HTMLDivElement;
+
+elColor.value = color;
 //from the server
-let gameState = {
+let gameState: GameState = {
   needToDraw: false,
   players: [],
+  bullets: [],
+  boosts: []
 };
 //local mouse position
 let mouse = {
@@ -27,15 +50,19 @@ let mouse = {
   },
 };
 
+const elButton: HTMLButtonElement = document.getElementById('start') as HTMLButtonElement;
+
+elButton.addEventListener('click', goLesFumer);
+
 function goLesFumer() {
-  username = document.getElementById("name").value;
-  color = document.getElementById("color").value;
+  username = elName.value;
+  color = elColor.value;
 
   if (username.length === 0) {
     username = "LE GROS CON";
   }
-  document.getElementById("landing").style.display = "none";
-  document.getElementById("app").style.display = "block";
+  elLanding.style.display = "none";
+  canvas.style.display = "block";
 
   init();
 }
@@ -155,7 +182,7 @@ function init() {
     gameState.needToDraw = true;
   });
 
-  if (canvas.getContext) {
+  if (canvas.getContext('2d')) {
     console.log("Game is ready 😊");
     setInterval(draw, timePerTick);
   }

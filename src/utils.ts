@@ -1,21 +1,23 @@
-function calcVector(ax, ay, bx, by) {
+import Player from './models/Player';
+
+export const calcVector = function (ax: number, ay: number, bx: number, by: number) {
   return {
     x: bx - ax,
     y: by - ay,
   };
-}
+};
 
-function getDistanceOfVector(vector) {
+export const getDistanceOfVector = function (vector: any) {
   return Math.sqrt(vector.x * vector.x + vector.y * vector.y);
-}
+};
 
-function random(min, max) {
+export const random = function (min: number, max: number) {
   min = Math.ceil(min);
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min + 1) + min);
-}
+};
 
-function randomPosOnScreen(players) {
+export const randomPosOnScreen = function(players) {
   //TODO A enlever avec la map dynamique
   let min = minScreenSize(players);
   return {
@@ -25,7 +27,7 @@ function randomPosOnScreen(players) {
   }
 }
 
-function minScreenSize(players) {
+export const minScreenSize = function (players: Player[]) {
   let width = 0;
   let height = 0;
   players.forEach((player) => {
@@ -38,7 +40,7 @@ function minScreenSize(players) {
   };
 }
 
-function getRandomColor() {
+export const getRandomColor = function() {
     return "#" + Math.floor(Math.random() * 16777215).toString(16);
 }
 

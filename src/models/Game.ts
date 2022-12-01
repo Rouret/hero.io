@@ -1,12 +1,16 @@
-const Player = require("./Player");
-const Bullet = require("./Bullet");
+import Player from './Player';
+import Bullet from './Bullet';
 
 const { randomPosOnScreen, getRandomColor,
 } = require("../utils");
 const Boost = require("./Boost");
 const { getRandomBoostType} = require("./BoostTypes");
 
-class Game {
+export default class Game {
+  players: any[];
+  bullets: any[];
+  boosts: any[];
+
   constructor() {
     this.players = [];
     this.bullets = [];
@@ -34,5 +38,3 @@ class Game {
     this.bullets = this.bullets.filter((b) => b.isAlive);
   }
 }
-
-module.exports = Game;

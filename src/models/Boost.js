@@ -1,4 +1,4 @@
-class Boost {
+export default class Boost {
     constructor(id, window, type, color, randomPosOnScreen) {
         this.id = id;
         this.type = type;
@@ -12,5 +12,3 @@ class Boost {
         };
     }
 }
-
-module.exports = Boost;

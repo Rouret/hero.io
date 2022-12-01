@@ -1,22 +1,18 @@
-const express = require("express");
+import express from 'express';
+import path from 'path';
+import http from 'http';
+import { Server, Socket } from 'socket.io';
+import Game from "./models/Game";
+import {calcVector, getDistanceOfVector, randomPosOnScreen} from './utils';
+
 const app = express();
-const path = require("path");
-const http = require("http");
 const server = http.createServer(app);
-const { Server } = require("socket.io");
 const io = new Server(server);
-const Game = require("./models/Game");
-const {
-  calcVector,
-  getDistanceOfVector,
-  random,
-  minScreenSize, randomPosOnScreen,
-} = require("./utils");
 
 const PORT = process.env.PORT || 8080;
+const PUBLIC_FOLDER = "../dist";
+const VIEWS_FOLDER = "../views";
 const TICK_RATE = 60;
-const PUBLIC_FOLDER = "public";
-const VIEWS_FOLDER = "views";
 const BOOST_INTERVAL = TICK_RATE * 10;
 let boostTimer = 0;
 
@@ -28,9 +24,9 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, VIEWS_FOLDER, "index.html"));
 });
 
-io.on("connection", (socket) => {
+io.on("connection", (socket: Socket) => {
   //create a new player and add it to our players array
-  let currentPlayer;
+  let currentPlayer: any;
   // Avant de commencer le client envoie des meta donnéess
   socket.on("init", (data) => {
     currentPlayer = game.addPlayer(
