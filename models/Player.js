@@ -9,10 +9,9 @@ class Player {
       x: 0,
       y: 0,
     };
-    this.color = "#" + Math.floor(Math.random() * 16777215).toString(16);
-    this.speed = 2;
+    this.speed = 3;
     this.score = 0;
-    this.size = 30;
+    this.size = 25;
     this.clientDim = {
       width: window.width,
       height: window.height,

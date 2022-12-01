@@ -14,7 +14,7 @@ const {
   minScreenSize,
 } = require("./utils");
 
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 8081;
 const PUBLIC_FOLDER = "public";
 const VIEWS_FOLDER = "views";
 
@@ -33,7 +33,12 @@ io.on("connection", (socket) => {
   // Avant de commencer le client envoie des meta donnéess
   socket.on("init", (data) => {
     console.log(data);
-    currentPlayer = new Player(socket.id, data.window, data.name, data.color);
+    currentPlayer = new Player(
+      socket.id,
+      data.window,
+      data.name.slice(0, 10),
+      data.color
+    );
     players.push(currentPlayer);
   });
   //On envoye au client ses données
@@ -43,6 +48,7 @@ io.on("connection", (socket) => {
   io.emit("update", { players: players });
 
   socket.on("moving", (playerMouvementInformation) => {
+    if (currentPlayer === undefined) return;
     currentPlayer.mouse = playerMouvementInformation;
   });
 
