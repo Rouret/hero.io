@@ -1,5 +1,5 @@
 class Player {
-  constructor(id) {
+  constructor(id, window) {
     this.id = id;
     this.x = 0;
     this.y = 0;
@@ -11,13 +11,16 @@ class Player {
     this.speed = 1;
     this.score = 0;
     this.size = 30;
+    this.clientDim = {
+      width: window.width,
+      height: window.height,
+    };
   }
 
   isCollidingWith(bullets) {
-    for (let i = 0; i < bullets.length; i++) {
-      const bullet = bullets[i];
+    for (let bullet of bullets) {
       if (
-        bullet.player.id != this.id &&
+        bullet.player.id !== this.id &&
         bullet.current.x >= this.x - this.size / 2 &&
         bullet.current.x <= this.x + this.size / 2 &&
         bullet.current.y >= this.y - this.size / 2 &&

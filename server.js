@@ -7,8 +7,12 @@ const { Server } = require("socket.io");
 const io = new Server(server);
 const Player = require("./models/Player");
 const Bullet = require("./models/Bullet");
-const { calcVector, getDistanceOfVector } = require("./utils");
-const { SocketAddress } = require("net");
+const {
+  calcVector,
+  getDistanceOfVector,
+  random,
+  minScreenSize,
+} = require("./utils");
 
 const PORT = process.env.PORT || 8080;
 const PUBLIC_FOLDER = "public";
@@ -25,13 +29,14 @@ app.get("/", (req, res) => {
 
 io.on("connection", (socket) => {
   //create a new player and add it to our players array
-  var currentPlayer = new Player(socket.id);
-  players.push(currentPlayer);
-
-  console.log(
-    `New player connected: ${socket.id}, current players: ${players.length}`
-  );
-
+  var currentPlayer;
+  // Avant de commencer le client envoie des meta donnéess
+  socket.on("init", (data) => {
+    currentPlayer = new Player(socket.id, data.window);
+    console.log(currentPlayer);
+    players.push(currentPlayer);
+  });
+  //On envoye au client ses données
   socket.emit("newPlayer", currentPlayer);
 
   //send the players object to the new player
@@ -60,9 +65,10 @@ io.on("connection", (socket) => {
   });
 });
 
+//gamestate loop
 var int = setInterval(() => {
   bullets = bullets.filter((b) => b.isAlive);
-  if (players.length == 0) return;
+  if (players.length === 0) return;
   bullets.forEach((bullet) => {
     var vector = calcVector(
       bullet.current.x,
@@ -89,8 +95,9 @@ var int = setInterval(() => {
       let playerId = bulletCollided.player.id;
       p = players.find((p) => p.id !== playerId);
       p.score += 1;
-      player.x = 0;
-      player.y = 0;
+      var min = minScreenSize(players);
+      player.x = random(0, min.width);
+      player.y = random(0, min.height);
     }
 
     var vector = calcVector(player.x, player.y, player.mouse.x, player.mouse.y);

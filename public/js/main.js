@@ -56,6 +56,13 @@ canvas.addEventListener(
 );
 
 //IO
+socket.emit("init", {
+  window: {
+    width: canvas.width,
+    height: canvas.height,
+  },
+});
+
 socket.on("newPlayer", (player) => {
   currentPlayer = { ...player };
 });
