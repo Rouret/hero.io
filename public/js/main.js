@@ -1,7 +1,7 @@
 const socket = io();
 const canvas = document.getElementById("app");
 const ctx = canvas.getContext("2d");
-const FPS = 30;
+const FPS = 60;
 const timePerTick = 1000 / FPS;
 
 //GAME SETUP
