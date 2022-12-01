@@ -1,4 +1,11 @@
-class Bullet {
+export default class Bullet {
+  current: any;
+  player: any;
+  end: any;
+  color: any;
+  speed: number;
+  isAlive: boolean;
+  
   constructor(startX, startY, endX, endY, player) {
     this.current = {
       x: startX,
@@ -14,5 +21,3 @@ class Bullet {
     this.isAlive = true;
   }
 }
-
-module.exports = Bullet;

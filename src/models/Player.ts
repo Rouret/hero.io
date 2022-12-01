@@ -1,4 +1,15 @@
-class Player {
+export default class Player {
+  id: any;
+  name: string;
+  color: any;
+  x: number;
+  y: number;
+  mouse: any;
+  speed: number;
+  score: number;
+  size: number;
+  clientDim: any;
+
   constructor(id, window, name, color) {
     this.id = id;
     this.name = name;
@@ -33,5 +44,3 @@ class Player {
     return null;
   }
 }
-
-module.exports = Player;

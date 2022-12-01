@@ -7,6 +7,26 @@ By Lucas Rouret.
 [❗] -> Bugs O_o.<br>
 [✔️] -> Finished.<br>
 
+## Running the app
+
+First, you need to build the code (server and client combined) :
+
+```bash
+npm run build
+```
+
+Then, you can run the server using : 
+```bash
+npm run start
+```
+
+Front-end assets won't be updated while the dev server is running, coming soon with Webpack Dev Server.
+
+### V0.1.3 (rc-1)
+
+[✔️] -> added TypeScript suppport <br>
+[✔️] -> webpack to build front bundles <br>
+
 ### V0.1.2
 
 [✔️] - player can have a name and custom color<br>
