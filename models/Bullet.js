@@ -10,7 +10,7 @@ class Bullet {
       y: endY,
     };
     this.color = this.player.color;
-    this.speed = 7;
+    this.speed = 5;
     this.isAlive = true;
   }
 }

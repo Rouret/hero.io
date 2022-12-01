@@ -8,7 +8,9 @@ class Player {
       y: 0,
     };
     this.color = "#" + Math.floor(Math.random() * 16777215).toString(16);
-    this.speed = 3;
+    this.speed = 1;
+    this.score = 0;
+    this.size = 30;
   }
 
   isCollidingWith(bullets) {
@@ -16,15 +18,15 @@ class Player {
       const bullet = bullets[i];
       if (
         bullet.player.id != this.id &&
-        bullet.current.x >= this.x - PLAYER_SIZE / 2 &&
-        bullet.current.x <= this.x + PLAYER_SIZE / 2 &&
-        bullet.current.y >= this.y - PLAYER_SIZE / 2 &&
-        bullet.current.y <= this.y + PLAYER_SIZE / 2
+        bullet.current.x >= this.x - this.size / 2 &&
+        bullet.current.x <= this.x + this.size / 2 &&
+        bullet.current.y >= this.y - this.size / 2 &&
+        bullet.current.y <= this.y + this.size / 2
       ) {
-        return true;
+        return bullet;
       }
     }
-    return false;
+    return null;
   }
 }
 

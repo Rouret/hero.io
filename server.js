@@ -8,8 +8,9 @@ const io = new Server(server);
 const Player = require("./models/Player");
 const Bullet = require("./models/Bullet");
 const { calcVector, getDistanceOfVector } = require("./utils");
+const { SocketAddress } = require("net");
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 const PUBLIC_FOLDER = "public";
 const VIEWS_FOLDER = "views";
 
@@ -30,6 +31,8 @@ io.on("connection", (socket) => {
   console.log(
     `New player connected: ${socket.id}, current players: ${players.length}`
   );
+
+  socket.emit("newPlayer", currentPlayer);
 
   //send the players object to the new player
   io.emit("update", { players: players });
@@ -81,7 +84,11 @@ var int = setInterval(() => {
   });
 
   players.forEach((player) => {
-    if (player.isCollidingWith(bullets)) {
+    let bulletCollided = player.isCollidingWith(bullets);
+    if (bulletCollided !== null) {
+      let playerId = bulletCollided.player.id;
+      p = players.find((p) => p.id !== playerId);
+      p.score += 1;
       player.x = 0;
       player.y = 0;
     }
