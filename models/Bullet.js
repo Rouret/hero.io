@@ -1,17 +1,18 @@
 class Bullet {
-    constructor(startX, startY, endX, endY) {
-        this.current = {
-            x: startX,
-            y: startY
-        }
-
-        this.end = {
-            x: endX,
-            y: endY
-        }
-        this.speed = 2;
-        this.isAlive = true;
-    }
+  constructor(startX, startY, endX, endY, player) {
+    this.current = {
+      x: startX,
+      y: startY,
+    };
+    this.player = player;
+    this.end = {
+      x: endX,
+      y: endY,
+    };
+    this.color = this.player.color;
+    this.speed = 7;
+    this.isAlive = true;
+  }
 }
 
 module.exports = Bullet;
