@@ -47,8 +47,12 @@ let mouse = {
 };
 
 const elButton: HTMLButtonElement = document.getElementById('start') as HTMLButtonElement;
-
 elButton.addEventListener('click', goLesFumer);
+elName.addEventListener("keyup", ({key}) => {
+  if (key === "Enter") {
+    goLesFumer();
+  }
+})
 
 function goLesFumer() {
   username = elName.value;
@@ -133,6 +137,12 @@ function init() {
   canvas.width = window.document.documentElement.clientWidth;
   canvas.height = window.document.documentElement.clientHeight - 1;
   //Detect mouse movement
+  document.addEventListener("keyup", (event) => {
+    if (event.key === " ") {
+      socket.emit("shoot", { x: mouse.current.x, y: mouse.current.y });
+    }
+  })
+
   canvas.addEventListener(
     "mousemove",
     function (event) {
