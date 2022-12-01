@@ -6,14 +6,14 @@ const timePerTick = 1000 / FPS;
 
 //GAME SETUP
 const BACKGROUND_COLOR = "#999999";
-var currentPlayer = {};
+let currentPlayer = {};
 //from the server
-var gameState = {
+let gameState = {
   needToDraw: false,
   players: [],
 };
 //local mouse position
-var mouse = {
+let mouse = {
   current: {
     x: 0,
     y: 0,

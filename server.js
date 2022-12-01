@@ -18,8 +18,8 @@ const PORT = process.env.PORT || 8080;
 const PUBLIC_FOLDER = "public";
 const VIEWS_FOLDER = "views";
 
-var players = [];
-var bullets = [];
+let players = [];
+let bullets = [];
 
 app.use(express.static(path.join(__dirname, PUBLIC_FOLDER)));
 
@@ -29,7 +29,7 @@ app.get("/", (req, res) => {
 
 io.on("connection", (socket) => {
   //create a new player and add it to our players array
-  var currentPlayer;
+  let currentPlayer;
   // Avant de commencer le client envoie des meta donnéess
   socket.on("init", (data) => {
     currentPlayer = new Player(socket.id, data.window);
@@ -47,14 +47,15 @@ io.on("connection", (socket) => {
   });
 
   socket.on("shoot", (shootCord) => {
-    var bullet = new Bullet(
-      currentPlayer.x,
-      currentPlayer.y,
-      shootCord.x,
-      shootCord.y,
-      currentPlayer
+    bullets.push(
+      new Bullet(
+        currentPlayer.x,
+        currentPlayer.y,
+        shootCord.x,
+        shootCord.y,
+        currentPlayer
+      )
     );
-    bullets.push(bullet);
   });
 
   socket.on("disconnect", () => {
@@ -66,19 +67,19 @@ io.on("connection", (socket) => {
 });
 
 //gamestate loop
-var int = setInterval(() => {
+setInterval(() => {
   bullets = bullets.filter((b) => b.isAlive);
   if (players.length === 0) return;
   bullets.forEach((bullet) => {
-    var vector = calcVector(
+    let vector = calcVector(
       bullet.current.x,
       bullet.current.y,
       bullet.end.x,
       bullet.end.y
     );
-    var distance = getDistanceOfVector(vector);
+    let distance = getDistanceOfVector(vector);
 
-    var coef = distance / bullet.speed;
+    let coef = distance / bullet.speed;
     if (coef > 1) {
       bullet.current.x += vector.x * (1 / coef);
       bullet.current.y += vector.y * (1 / coef);
@@ -93,17 +94,17 @@ var int = setInterval(() => {
     let bulletCollided = player.isCollidingWith(bullets);
     if (bulletCollided !== null) {
       let playerId = bulletCollided.player.id;
-      p = players.find((p) => p.id !== playerId);
+      let p = players.find((p) => p.id !== playerId);
       p.score += 1;
-      var min = minScreenSize(players);
+      let min = minScreenSize(players);
       player.x = random(0, min.width);
       player.y = random(0, min.height);
     }
 
-    var vector = calcVector(player.x, player.y, player.mouse.x, player.mouse.y);
-    var distance = getDistanceOfVector(vector);
+    let vector = calcVector(player.x, player.y, player.mouse.x, player.mouse.y);
+    let distance = getDistanceOfVector(vector);
 
-    var coef = distance / player.speed;
+    let coef = distance / player.speed;
     if (coef > 1) {
       player.x += vector.x * (1 / coef);
       player.y += vector.y * (1 / coef);
