@@ -126,7 +126,6 @@ setInterval(() => {
   // Generate boosts
   boostTimer++;
   if (boostTimer >= BOOST_INTERVAL) {
-    console.log("Boost generated");
     const randomPos = randomPosOnScreen(game.players);
     game.addBoost(randomPos);
     boostTimer = 0;

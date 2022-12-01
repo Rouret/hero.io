@@ -1,6 +1,5 @@
 import {BoostTypes} from "./BoostTypes";
 import Coordinate from "./Coordinate";
-
 export default class Player {
   id: string;
   name: string;
@@ -60,12 +59,15 @@ export default class Player {
   }
 
   setEffect(effect) {
-    console.log("OUI")
-    this.effect = effect;
+    this.effect = effect.type;
 
-    switch (effect) {
-        case BoostTypes.SPEED:
-            this.speed += 1;
+    switch (effect.type) {
+        case BoostTypes.SPEED:{
+          this.speed += 1;
+          break;
+        }
+        default:
+          break;
     }
   }
 
