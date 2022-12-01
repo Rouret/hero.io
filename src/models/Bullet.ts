@@ -1,21 +1,18 @@
+import Player from "./Player";
+import Coordinate from "./Coordinate";
+
 export default class Bullet {
-  current: any;
-  player: any;
-  end: any;
-  color: any;
+  current: Coordinate;
+  player: Player;
+  end: Coordinate;
+  color: string;
   speed: number;
   isAlive: boolean;
   
   constructor(startX, startY, endX, endY, player) {
-    this.current = {
-      x: startX,
-      y: startY,
-    };
+    this.current = new Coordinate(startX, startY);
     this.player = player;
-    this.end = {
-      x: endX,
-      y: endY,
-    };
+    this.end = new Coordinate(endX, endY);
     this.color = this.player.color;
     this.speed = 5;
     this.isAlive = true;

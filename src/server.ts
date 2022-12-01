@@ -4,6 +4,8 @@ import http from 'http';
 import { Server, Socket } from 'socket.io';
 import Game from "./models/Game";
 import {calcVector, getDistanceOfVector, randomPosOnScreen} from './utils';
+import Coordinate from "./models/Coordinate";
+import Player from "./models/Player";
 
 const app = express();
 const server = http.createServer(app);
@@ -26,7 +28,7 @@ app.get("/", (req, res) => {
 
 io.on("connection", (socket: Socket) => {
   //create a new player and add it to our players array
-  let currentPlayer: any;
+  let currentPlayer: Player;
   // Avant de commencer le client envoie des meta donnéess
   socket.on("init", (data) => {
     currentPlayer = game.addPlayer(
@@ -35,8 +37,9 @@ io.on("connection", (socket: Socket) => {
       data.name.slice(0, 15),
       data.color
     );
-    socket.emit("newPlayer", currentPlayer);
+
   });
+  socket.emit("newPlayer", currentPlayer);
   //On envoye au client ses données
 
   //send the players object to the new player
@@ -44,13 +47,13 @@ io.on("connection", (socket: Socket) => {
 
   socket.on("moving", (playerMouvementInformation) => {
     if (currentPlayer !== undefined)
-      currentPlayer.mouse = playerMouvementInformation;
+      currentPlayer.mouse = new Coordinate(playerMouvementInformation.x, playerMouvementInformation.y);
   });
 
   socket.on("shoot", (shootCord) => {
     game.addBullet(
-      currentPlayer.x,
-      currentPlayer.y,
+      currentPlayer.coordinate.x,
+      currentPlayer.coordinate.y,
       shootCord.x,
       shootCord.y,
       currentPlayer
@@ -97,20 +100,20 @@ setInterval(() => {
       game.players.find((p) => p.id !== playerId).score++;
 
       let randomCoords = randomPosOnScreen(game.players);
-      player.x = randomCoords.x;
-      player.y = randomCoords.y;
+      player.coordinate.x = randomCoords.x;
+      player.coordinate.y = randomCoords.y;
     }
 
-    let vector = calcVector(player.x, player.y, player.mouse.x, player.mouse.y);
+    let vector = calcVector(player.coordinate.x, player.coordinate.y, player.mouse.x, player.mouse.y);
     let distance = getDistanceOfVector(vector);
 
     let coef = distance / player.speed;
     if (coef > 1) {
-      player.x += vector.x / coef;
-      player.y += vector.y / coef;
+      player.coordinate.x += vector.x / coef;
+      player.coordinate.y += vector.y / coef;
     } else {
-      player.x = player.mouse.x;
-      player.y = player.mouse.y;
+      player.coordinate.x = player.mouse.x;
+      player.coordinate.y = player.mouse.y;
     }
 
     let boostCollided = player.isCollidingWithBoost(game.boosts);
@@ -128,7 +131,6 @@ setInterval(() => {
     game.addBoost(randomPos);
     boostTimer = 0;
   }
-
   io.emit("update", { players: game.players, bullets: game.bullets, boosts: game.boosts });
 }, TICK_RATE / 1000);
 

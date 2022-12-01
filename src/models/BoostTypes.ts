@@ -1,8 +1,8 @@
-const BoostTypes = {
+export const BoostTypes = {
     SPEED: "SPEED"
 }
 
-function getRandomBoostType() {
+export const  getRandomBoostType= function() {
     let boostTypes = Object.values(BoostTypes);
     return boostTypes[Math.floor(Math.random() * boostTypes.length)];
 }

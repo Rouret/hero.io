@@ -1,28 +1,24 @@
 import io from 'socket.io-client';
+import Bullet from "../models/Bullet";
+import Boost from "../models/Boost";
+import Player from "../models/Player";
 const socket = io();
 const canvas: HTMLCanvasElement = document.getElementById("app") as HTMLCanvasElement;
 const ctx: CanvasRenderingContext2D = canvas.getContext("2d")!!;
 const FPS = 60;
 const timePerTick = 1000 / FPS;
 
-type Player = {
-  name: string;
-  score: number;
-}
 
 type GameState = {
   needToDraw: boolean;
   players: Player[];
-  bullets: [];
-  boosts: [];
+  bullets: Bullet[];
+  boosts: Boost[];
 }
 
 //GAME SETUP
 const BACKGROUND_COLOR = "#fff";
-let currentPlayer: Player = {
-  name: '',
-  score: 0
-};
+let currentPlayer: Player;
 let username;
 let color = "#" + Math.floor(Math.random() * 16777215).toString(16);
 
@@ -57,7 +53,6 @@ elButton.addEventListener('click', goLesFumer);
 function goLesFumer() {
   username = elName.value;
   color = elColor.value;
-
   if (username.length === 0) {
     username = "LE GROS CON";
   }
@@ -67,32 +62,33 @@ function goLesFumer() {
   init();
 }
 //Canvas
-function drawPlayer(player) {
+function drawPlayer(player: Player) {
   ctx.fillStyle = player.color;
   ctx.fillRect(
-    player.x - player.size / 2,
-    player.y - player.size / 2,
+    player.coordinate.x - player.size / 2,
+    player.coordinate.y - player.size / 2,
     player.size,
     player.size
   );
 
-  ctx.fillStyle = "#000000";
+  ctx.fillStyle = "black";
   ctx.font = "15px Arial";
   ctx.fillText(
     player.name,
-    player.x - player.size / 1.9,
-    player.y + player.size
+    player.coordinate.x - player.size / 1.9,
+    player.coordinate.y + player.size
   );
 }
 
-function drawBullet(bullet) {
+function drawBullet(bullet : Bullet) {
+  console.log(bullet)
   ctx.fillStyle = bullet.color;
   ctx.fillRect(bullet.current.x - 2, bullet.current.y - 2, 10, 10);
 }
 
-function drawBoost(boost) {
+function drawBoost(boost : Boost) {
   ctx.fillStyle = boost.color;
-    //ctx.fillRect( boost.x - boost.size / 2, boost.y - boost.size / 2, boost.size, boost.size);
+  ctx.fillRect( boost.x - boost.size / 2, boost.y - boost.size / 2, boost.size, boost.size);
 }
 
 function drawLeaderboard() {

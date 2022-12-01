@@ -1,4 +1,12 @@
 export default class Boost {
+    id: string;
+    type: string;
+    color: string;
+    size: number;
+    x: number;
+    y: number;
+    clientDim: any;
+
     constructor(id, window, type, color, randomPosOnScreen) {
         this.id = id;
         this.type = type;

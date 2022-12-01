@@ -1,15 +1,13 @@
 import Player from './Player';
 import Bullet from './Bullet';
-
-const { randomPosOnScreen, getRandomColor,
-} = require("../utils");
-const Boost = require("./Boost");
-const { getRandomBoostType} = require("./BoostTypes");
+import Boost from "./Boost";
+import {randomPosOnScreen, getRandomColor} from '../utils';
+import { getRandomBoostType} from './BoostTypes';
 
 export default class Game {
-  players: any[];
-  bullets: any[];
-  boosts: any[];
+  players: Player[];
+  bullets: Bullet[];
+  boosts: Boost[];
 
   constructor() {
     this.players = [];
@@ -20,7 +18,6 @@ export default class Game {
   addPlayer(id, window, name, color) {
     let player = new Player(id, window, name, color);
     this.players.push(player);
-
     return player;
   }
 
