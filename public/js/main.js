@@ -36,8 +36,8 @@ canvas.addEventListener(
     mouse.current.y = event.clientY;
 
     if (
-      mouse.current.x != mouse.previous.x ||
-      mouse.current.y != mouse.previous.y
+      mouse.current.x !== mouse.previous.x ||
+      mouse.current.y !== mouse.previous.y
     ) {
       socket.emit("moving", mouse.current);
       mouse.previous = { ...mouse.current };
