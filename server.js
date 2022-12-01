@@ -17,6 +17,8 @@ const PORT = process.env.PORT || 8080;
 const TICK_RATE = 60;
 const PUBLIC_FOLDER = "public";
 const VIEWS_FOLDER = "views";
+const BOOST_INTERVAL = TICK_RATE * 10;
+let boostTimer = 0;
 
 let game = new Game();
 
@@ -114,8 +116,24 @@ setInterval(() => {
       player.x = player.mouse.x;
       player.y = player.mouse.y;
     }
+
+    let boostCollided = player.isCollidingWithBoost(game.boosts);
+    if (boostCollided !== null) {
+      player.setEffect(boostCollided);
+      game.boosts = game.boosts.filter((b) => b.id !== boostCollided.id);
+    }
   });
-  io.emit("update", { players: game.players, bullets: game.bullets });
+
+  // Generate boosts
+  boostTimer++;
+  if (boostTimer >= BOOST_INTERVAL) {
+    console.log("Boost generated");
+    const randomPos = randomPosOnScreen(game.players);
+    game.addBoost(randomPos);
+    boostTimer = 0;
+  }
+
+  io.emit("update", { players: game.players, bullets: game.bullets, boosts: game.boosts });
 }, TICK_RATE / 1000);
 
 server.listen(PORT, () => {

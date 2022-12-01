@@ -26,7 +26,7 @@ class Game {
   }
 
   addBoost(window) {
-    let boost = new Boost(1, window, getRandomBoostType(), getRandomColor(), randomPosOnScreen(this.players));
+    let boost = new Boost(this.boosts.length+1, window, getRandomBoostType(), getRandomColor(), randomPosOnScreen(this.players));
     this.boosts.push(boost);
   }
 

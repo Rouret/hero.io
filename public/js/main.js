@@ -63,6 +63,11 @@ function drawBullet(bullet) {
   ctx.fillRect(bullet.current.x - 2, bullet.current.y - 2, 10, 10);
 }
 
+function drawBoost(boost) {
+  ctx.fillStyle = boost.color;
+    //ctx.fillRect( boost.x - boost.size / 2, boost.y - boost.size / 2, boost.size, boost.size);
+}
+
 function drawLeaderboard() {
   ctx.fillStyle = "black";
   ctx.font = "30px Arial";
@@ -90,6 +95,9 @@ function draw() {
 
     //draw bullets
     gameState.bullets.forEach(drawBullet);
+
+    //draw boosts
+    gameState.boosts.forEach(drawBoost);
 
     drawLeaderboard();
 

@@ -35,6 +35,22 @@ class Player {
     }
     return null;
   }
+
+  isCollidingWithBoost(boosts) {
+    for (let boost of boosts) {
+      if (
+        boost.id !== this.id &&
+        this.x >= boost.x - boost.size / 2 &&
+        this.x <= boost.x + boost.size / 2 &&
+        this.y >= boost.y - boost.size / 2 &&
+        this.y <= boost.y + boost.size / 2
+      ) {
+        return boost;
+      }
+    }
+    return null;
+  }
+
   setEffect(effect) {
     this.effect = effect;
 
