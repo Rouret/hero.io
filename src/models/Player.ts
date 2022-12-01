@@ -74,7 +74,7 @@ export default class Player {
   removeEffect() {
     switch (this.effect) {
       case BoostTypes.SPEED:
-        this.speed = 2;
+        this.speed = 3;
     }
     this.effect = null;
   }
