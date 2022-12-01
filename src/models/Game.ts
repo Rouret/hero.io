@@ -1,7 +1,10 @@
-const Player = require("./Player");
-const Bullet = require("./Bullet");
+import Player from './Player';
+import Bullet from './Bullet';
 
-class Game {
+export default class Game {
+  players: any[];
+  bullets: any[];
+
   constructor() {
     this.players = [];
     this.bullets = [];
@@ -23,5 +26,3 @@ class Game {
     this.bullets = this.bullets.filter((b) => b.isAlive);
   }
 }
-
-module.exports = Game;
