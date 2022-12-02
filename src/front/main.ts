@@ -92,7 +92,13 @@ function drawBullet(bullet : Bullet) {
 
 function drawBoost(boost : Boost) {
   ctx.fillStyle = boost.color;
-  ctx.fillRect( boost.x - boost.size / 2, boost.y - boost.size / 2, boost.size, boost.size);
+  const saveFillStyle = ctx.fillStyle;
+  ctx.beginPath();
+  ctx.fillStyle = boost.color;
+  ctx.arc(boost.x, boost.y, boost.size, 0, 2 * Math.PI);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = saveFillStyle;
 }
 
 function drawLeaderboard() {

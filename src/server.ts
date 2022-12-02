@@ -102,6 +102,7 @@ setInterval(() => {
       let randomCoords = randomPosOnScreen(game.players);
       player.coordinate.x = randomCoords.x;
       player.coordinate.y = randomCoords.y;
+      player.removeEffect();
     }
 
     let vector = calcVector(player.coordinate.x, player.coordinate.y, player.mouse.x, player.mouse.y);

@@ -13,7 +13,7 @@ export default class Boost {
         this.color = color;
         this.x = randomPosOnScreen.x;
         this.y = randomPosOnScreen.y;
-        this.size = 25;
+        this.size = 10;
         this.clientDim = {
             width: window.width,
             height: window.height,
