@@ -47,10 +47,10 @@ export default class Player {
     for (let boost of boosts) {
       if (
         boost.id !== this.id &&
-        this.coordinate.x >= boost.x - boost.size / 2 &&
-        this.coordinate.x <= boost.x + boost.size / 2 &&
-        this.coordinate.y >= boost.y - boost.size / 2 &&
-        this.coordinate.y <= boost.y + boost.size / 2
+        this.coordinate.x >= boost.x - boost.size*1.5 &&
+        this.coordinate.x <= boost.x + boost.size*1.5 &&
+        this.coordinate.y >= boost.y - boost.size*1.5 &&
+        this.coordinate.y <= boost.y + boost.size*1.5
       ) {
         return boost;
       }
