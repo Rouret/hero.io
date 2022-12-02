@@ -32,7 +32,7 @@ Front-end assets won't be updated while the dev server is running, coming soon w
 - Spawn d'arme
 
 
-### V0.1.4 (rc-1)
+### V0.1.4
 
 [❌] -> ajout de nouveaux boostes avec des effets <br>
 [❌] -> design des players, bullets et boosts <br>
