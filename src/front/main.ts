@@ -1,30 +1,39 @@
-import io from 'socket.io-client';
+import io from "socket.io-client";
 import Bullet from "../models/Bullet";
 import Boost from "../models/Boost";
 import Player from "../models/Player";
+
 const socket = io();
-const canvas: HTMLCanvasElement = document.getElementById("app") as HTMLCanvasElement;
+const canvas: HTMLCanvasElement = document.getElementById(
+  "app"
+) as HTMLCanvasElement;
 const ctx: CanvasRenderingContext2D = canvas.getContext("2d")!!;
 const FPS = 60;
 const timePerTick = 1000 / FPS;
-
 
 type GameState = {
   needToDraw: boolean;
   players: Player[];
   bullets: Bullet[];
   boosts: Boost[];
-}
+};
 
 //GAME SETUP
 const BACKGROUND_COLOR = "#fff";
 let currentPlayer: Player;
+let cheat = true;
 let username;
 let color = "#" + Math.floor(Math.random() * 16777215).toString(16);
 
-const elColor: HTMLInputElement = document.getElementById('color') as HTMLInputElement;
-const elName: HTMLInputElement = document.getElementById("name") as HTMLInputElement;
-const elLanding: HTMLDivElement = document.getElementById("landing") as HTMLDivElement;
+const elColor: HTMLInputElement = document.getElementById(
+  "color"
+) as HTMLInputElement;
+const elName: HTMLInputElement = document.getElementById(
+  "name"
+) as HTMLInputElement;
+const elLanding: HTMLDivElement = document.getElementById(
+  "landing"
+) as HTMLDivElement;
 
 elColor.value = color;
 //from the server
@@ -32,7 +41,7 @@ let gameState: GameState = {
   needToDraw: false,
   players: [],
   bullets: [],
-  boosts: []
+  boosts: [],
 };
 //local mouse position
 let mouse = {
@@ -46,13 +55,15 @@ let mouse = {
   },
 };
 
-const elButton: HTMLButtonElement = document.getElementById('start') as HTMLButtonElement;
-elButton.addEventListener('click', goLesFumer);
-elName.addEventListener("keyup", ({key}) => {
+const elButton: HTMLButtonElement = document.getElementById(
+  "start"
+) as HTMLButtonElement;
+elButton.addEventListener("click", goLesFumer);
+elName.addEventListener("keyup", ({ key }) => {
   if (key === "Enter") {
     goLesFumer();
   }
-})
+});
 
 function goLesFumer() {
   username = elName.value;
@@ -84,13 +95,21 @@ function drawPlayer(player: Player) {
   );
 }
 
-function drawBullet(bullet : Bullet) {
-  console.log(bullet)
+function drawBullet(bullet: Bullet) {
   ctx.fillStyle = bullet.color;
   ctx.fillRect(bullet.current.x - 2, bullet.current.y - 2, 10, 10);
+
+  //draw a line from the player to the bullet
+  if (cheat) {
+    ctx.beginPath();
+    ctx.moveTo(bullet.current.x, bullet.current.y);
+    ctx.lineTo(bullet.end.x, bullet.end.y);
+    ctx.strokeStyle = bullet.color;
+    ctx.stroke();
+  }
 }
 
-function drawBoost(boost : Boost) {
+function drawBoost(boost: Boost) {
   ctx.fillStyle = boost.color;
   const saveFillStyle = ctx.fillStyle;
   ctx.beginPath();
@@ -147,7 +166,7 @@ function init() {
     if (event.key === " ") {
       socket.emit("shoot", { x: mouse.current.x, y: mouse.current.y });
     }
-  })
+  });
 
   canvas.addEventListener(
     "mousemove",
@@ -194,7 +213,7 @@ function init() {
     gameState.needToDraw = true;
   });
 
-  if (canvas.getContext('2d')) {
+  if (canvas.getContext("2d")) {
     console.log("Game is ready 😊");
     setInterval(draw, timePerTick);
   }

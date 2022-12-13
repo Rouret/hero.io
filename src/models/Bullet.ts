@@ -14,7 +14,7 @@ export default class Bullet {
     this.player = player;
     this.end = new Coordinate(endX, endY);
     this.color = this.player.color;
-    this.speed = 5;
+    this.speed = 10;
     this.isAlive = true;
   }
 }

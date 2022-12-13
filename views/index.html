@@ -14,20 +14,18 @@
             padding: 0;
             margin: 0;
         }
-
+        
         canvas {
             display: none;
         }
-
+        
         .box {
-
             border: 1px solid black;
             box-shadow: 0 0 10px black;
             padding: 30px;
-
             background: #fff;
         }
-
+        
         #landing {
             left: 0;
             right: 0;
@@ -36,85 +34,71 @@
             position: absolute;
             background: linear-gradient(124deg, #d11919, #ffa500, #fef9c9, #9be292, #94c05b, #409072, #05a9ab, #004f99);
             background-size: 1800% 1800%;
-
             -webkit-animation: rainbow 40s ease infinite;
             -z-animation: rainbow 40s ease infinite;
             -o-animation: rainbow 40s ease infinite;
             animation: rainbow 40s ease infinite;
             width: 100vw;
             height: 100vh;
-
             display: flex;
             justify-content: space-around;
             align-items: center;
-
             flex-direction: row;
         }
-
-
+        
         @-webkit-keyframes rainbow {
             0% {
                 background-position: 0% 82%
             }
-
             50% {
                 background-position: 100% 19%
             }
-
             100% {
                 background-position: 0% 82%
             }
         }
-
+        
         @-moz-keyframes rainbow {
             0% {
                 background-position: 0% 82%
             }
-
             50% {
                 background-position: 100% 19%
             }
-
             100% {
                 background-position: 0% 82%
             }
         }
-
+        
         @-o-keyframes rainbow {
             0% {
                 background-position: 0% 82%
             }
-
             50% {
                 background-position: 100% 19%
             }
-
             100% {
                 background-position: 0% 82%
             }
         }
-
+        
         @keyframes rainbow {
             0% {
                 background-position: 0% 82%
             }
-
             50% {
                 background-position: 100% 19%
             }
-
             100% {
                 background-position: 0% 82%
             }
         }
-
-
+        
         #landing-content {
             display: flex;
             flex-direction: column;
-
         }
-
+        
         .mb-2 {
             margin-bottom: 20px;
         }
@@ -140,7 +124,6 @@
         </div>
 
     </div>
-    <img src="./images/sBg.png">
     <script src="/socket.io/socket.io.js"></script>
     <script src="js/main.js"></script>
 </body>

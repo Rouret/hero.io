@@ -51,8 +51,8 @@ export default class ShooterServer {
         bullet.current.x += vector.x / coef;
         bullet.current.y += vector.y / coef;
       } else {
-        bullet.current.x += bullet.end.x;
-        bullet.current.y += bullet.end.y;
+        bullet.current.x = bullet.end.x;
+        bullet.current.y = bullet.end.y;
         bullet.isAlive = false;
       }
     });
