@@ -5,7 +5,7 @@
     "main": "out/server.js",
     "scripts": {
         "start": "node .",
-        "dev": "ts-node src/models/ShooterServer.ts",
+        "dev": "tsc && webpack --config ./webpack.config.js --mode production && ts-node src/bootstrap.ts",
         "build": "tsc && webpack --config ./webpack.config.js --mode production",
         "build-dev": "webpack --config ./webpack.config.js --mode development"
     },

@@ -1,5 +1,5 @@
-import ShooterServer from "./models/ShooterServer";
-
+import ShooterServer from "./ShooterServer";
 
 const server = new ShooterServer();
-server.startServer();
+server.start()
+
