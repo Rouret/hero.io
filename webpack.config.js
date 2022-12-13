@@ -9,13 +9,22 @@ module.exports = {
         use: 'ts-loader',
         exclude: /node_modules/,
       },
+      {
+        test: /\.png/,
+        type: 'asset/resource'
+      },
+      {
+        test: /\.html/,
+        type: 'asset/resource',
+        generator: {
+          filename: 'static/[hash][ext][query]'
+        }
+      }
     ],
-  },
-  resolve: {
-    extensions: ['.tsx', '.ts', '.js'],
   },
   output: {
     filename: 'bootstrap.js',
     path: path.resolve(__dirname, 'dist/js'),
+    assetModuleFilename: './images/[hash][ext][query]'
   },
 };
