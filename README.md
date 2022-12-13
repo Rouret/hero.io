@@ -12,12 +12,12 @@ By Lucas Rouret.
 First, you need to build the code (server and client combined) :
 
 ```bash
-npm run build
+npm run build-dev
 ```
 
 Then, you can run the server using : 
 ```bash
-npm run start
+npm run dev
 ```
 
 Front-end assets won't be updated while the dev server is running, coming soon with Webpack Dev Server.
