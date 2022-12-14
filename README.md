@@ -88,11 +88,13 @@ npm run dev
   ~~- [ ] restructure du code~~
     - [x] design des players, bullets
     - [x] design landing page
+- [ ] V0.1.5<br>
+    - [ ] Système de caméra dynamique
 
 ## Idées pour la suite
 
 - Une map plus grande avec des obstacle
-- Système de caméra dynamique
+- Système de caméra dynamique (V0.1.5)
 - Système d'arme
 - Vie / Shield
 - Spawn de joueur
