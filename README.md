@@ -35,7 +35,7 @@ Front-end assets won't be updated while the dev server is running, coming soon w
 ### V0.1.4
 
 [❌] -> ajout de nouveaux boostes avec des effets <br>
-[❌] -> design des players, bullets et boosts <br>
+[〰️] -> design des players, bullets et boosts <br>
 
 ### V0.1.3 (rc-1)
 

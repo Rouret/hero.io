@@ -20,7 +20,8 @@ export default class Player {
     this.mouse = new Coordinate(0, 0);
     this.speed = 3;
     this.score = 0;
-    this.size = 25;
+    this.size = 50;
+    
     this.clientDim = {
       width: window.width,
       height: window.height,

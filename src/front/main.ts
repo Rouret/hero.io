@@ -21,6 +21,7 @@ type GameState = {
 const BACKGROUND_COLOR = "#fff";
 let currentPlayer: Player;
 let cheat = true;
+let frameIndex = 0;
 let username;
 let color = "#" + Math.floor(Math.random() * 16777215).toString(16);
 
@@ -33,6 +34,9 @@ const elName: HTMLInputElement = document.getElementById(
 const elLanding: HTMLDivElement = document.getElementById(
   "landing"
 ) as HTMLDivElement;
+const playerRunImage = document.getElementById(
+  "player_run"
+) as HTMLImageElement;
 
 elColor.value = color;
 //from the server
@@ -53,6 +57,13 @@ let mouse = {
     y: 0,
   },
 };
+//config player
+const playerRunImageWidth = 280;
+const playerRunImageHeight = 40;
+const playerRunImageFrame = 7;
+const playerRunImageFrameWidth = playerRunImageWidth / playerRunImageFrame;
+const playerRunImageFrameHeight = playerRunImageHeight;
+const playerRunImageFrameY = 0;
 
 const elButton: HTMLButtonElement = document.getElementById(
   "start"
@@ -77,21 +88,28 @@ function goLesFumer() {
 }
 //Canvas
 function drawPlayer(player: Player) {
-  ctx.fillStyle = player.color;
-  ctx.fillRect(
-    player.coordinate.x - player.size / 2,
-    player.coordinate.y - player.size / 2,
+  let playerRunImageFrameIndex = Math.floor(
+    (frameIndex * playerRunImageFrame) / FPS
+  );
+  let playerRunImageFrameX =
+    playerRunImageFrameIndex * playerRunImageFrameWidth;
+
+  ctx.save();
+  ctx.translate(player.coordinate.x, player.coordinate.y);
+  ctx.rotate(0);
+  ctx.drawImage(
+    playerRunImage,
+    playerRunImageFrameX,
+    playerRunImageFrameY,
+    playerRunImageFrameWidth,
+    playerRunImageFrameHeight,
+    -player.size / 2,
+    -player.size / 2,
     player.size,
     player.size
   );
 
-  ctx.fillStyle = "black";
-  ctx.font = "15px Arial";
-  ctx.fillText(
-    player.name,
-    player.coordinate.x - player.size / 1.9,
-    player.coordinate.y + player.size
-  );
+  ctx.restore();
 }
 
 function drawBullet(bullet: Bullet) {
@@ -134,6 +152,11 @@ function drawLeaderboard() {
 }
 
 function draw() {
+  if (frameIndex === FPS) {
+    frameIndex = 0;
+  } else {
+    frameIndex++;
+  }
   if (gameState.needToDraw) {
     // clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
