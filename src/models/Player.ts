@@ -34,7 +34,7 @@ export default class Player {
   }
 
   isCollidingWith(bullets) {
-    for (let bullet of bullets) {
+    for (const bullet of bullets) {
       if (
         bullet.player.id !== this.id &&
         this.coordinate.x >= bullet.current.x - bullet.size &&
@@ -49,7 +49,7 @@ export default class Player {
   }
 
   isCollidingWithBoost(boosts) {
-    for (let boost of boosts) {
+    for (const boost of boosts) {
       if (
         boost.id !== this.id &&
         this.coordinate.x >= boost.x - boost.size*1.5 &&

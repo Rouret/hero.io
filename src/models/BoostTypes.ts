@@ -3,7 +3,7 @@ export const BoostTypes = {
 }
 
 export const  getRandomBoostType= function() {
-    let boostTypes = Object.values(BoostTypes);
+    const boostTypes = Object.values(BoostTypes);
     return boostTypes[Math.floor(Math.random() * boostTypes.length)];
 }
 
