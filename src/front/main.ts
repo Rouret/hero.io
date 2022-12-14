@@ -4,7 +4,7 @@ import Boost from "../models/Boost";
 import Player from "../models/Player";
 const socket = io();
 const canvas: HTMLCanvasElement = document.getElementById("app") as HTMLCanvasElement;
-const ctx: CanvasRenderingContext2D = canvas.getContext("2d")!!;
+const ctx: CanvasRenderingContext2D = canvas.getContext("2d");
 const FPS = 60;
 const timePerTick = 1000 / FPS;
 
@@ -18,7 +18,6 @@ type GameState = {
 
 //GAME SETUP
 const BACKGROUND_COLOR = "#fff";
-let currentPlayer: Player;
 let username;
 let color = "#" + Math.floor(Math.random() * 16777215).toString(16);
 
@@ -35,7 +34,7 @@ let gameState: GameState = {
   boosts: []
 };
 //local mouse position
-let mouse = {
+const mouse = {
   current: {
     x: 0,
     y: 0,
@@ -184,11 +183,6 @@ function init() {
     name: username,
     color: color,
   });
-
-  socket.on("newPlayer", (player) => {
-    currentPlayer = { ...player };
-  });
-
   socket.on("update", (gameStateFromServer) => {
     gameState = { ...gameStateFromServer };
     gameState.needToDraw = true;

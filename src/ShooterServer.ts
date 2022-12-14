@@ -38,15 +38,15 @@ export default class ShooterServer {
     this.game.filterBullet();
     if (this.game.players.length === 0) return;
     this.game.bullets.forEach((bullet) => {
-      let vector = calcVector(
+      const vector = calcVector(
         bullet.current.x,
         bullet.current.y,
         bullet.end.x,
         bullet.end.y
       );
-      let distance = getDistanceOfVector(vector);
+      const distance = getDistanceOfVector(vector);
 
-      let coef = distance / bullet.speed;
+      const coef = distance / bullet.speed;
       if (coef > 1) {
         bullet.current.x += vector.x / coef;
         bullet.current.y += vector.y / coef;
@@ -60,27 +60,27 @@ export default class ShooterServer {
 
   _loopPlayers() {
     this.game.players.forEach((player) => {
-      let bulletCollided = player.isCollidingWith(this.game.bullets);
+      const bulletCollided = player.isCollidingWith(this.game.bullets);
       if (bulletCollided !== null) {
-        let playerId = bulletCollided.player.id;
+        const playerId = bulletCollided.player.id;
 
         this.game.players.find((p) => p.id !== playerId).score++;
 
-        let randomCoords = randomPosOnScreen(this.game.players);
+        const randomCoords = randomPosOnScreen(this.game.players);
         player.coordinate.x = randomCoords.x;
         player.coordinate.y = randomCoords.y;
         player.removeEffect();
       }
 
-      let vector = calcVector(
+      const vector = calcVector(
         player.coordinate.x,
         player.coordinate.y,
         player.mouse.x,
         player.mouse.y
       );
-      let distance = getDistanceOfVector(vector);
+      const distance = getDistanceOfVector(vector);
 
-      let coef = distance / player.speed;
+      const coef = distance / player.speed;
       if (coef > 1) {
         player.coordinate.x += vector.x / coef;
         player.coordinate.y += vector.y / coef;
@@ -89,7 +89,7 @@ export default class ShooterServer {
         player.coordinate.y = player.mouse.y;
       }
 
-      let boostCollided = player.isCollidingWithBoost(this.game.boosts);
+      const boostCollided = player.isCollidingWithBoost(this.game.boosts);
       if (boostCollided !== null) {
         player.setEffect(boostCollided);
         this.game.boosts = this.game.boosts.filter(
