@@ -29,7 +29,7 @@ export default class ShooterServer {
     this.publicFolder = "../dist";
     this.viewsFolder = "../views";
     this.tickrate = 60;
-    this.boostInterval = this.tickrate * 10;
+    this.boostInterval = this.tickrate;
     this._boostTimer = 0;
     this.taskLoop = [this._loopBullets, this._loopPlayers, this._loopBoosts];
   }
@@ -51,8 +51,8 @@ export default class ShooterServer {
         bullet.current.x += vector.x / coef;
         bullet.current.y += vector.y / coef;
       } else {
-        bullet.current.x += bullet.end.x;
-        bullet.current.y += bullet.end.y;
+        bullet.current.x = bullet.end.x;
+        bullet.current.y = bullet.end.y;
         bullet.isAlive = false;
       }
     });
@@ -137,11 +137,19 @@ export default class ShooterServer {
       this.io.emit("update", { players: this.game.players });
 
       socket.on("moving", (playerMouvementInformation) => {
-        if (currentPlayer !== undefined)
-          currentPlayer.mouse = new Coordinate(
-            playerMouvementInformation.x,
-            playerMouvementInformation.y
-          );
+        if (currentPlayer === undefined) return;
+        currentPlayer.mouse = new Coordinate(
+          playerMouvementInformation.x,
+          playerMouvementInformation.y
+        );
+        //calculer la rotation du joeur par rapport à la souris
+        let vector = calcVector(
+          currentPlayer.coordinate.x,
+          currentPlayer.coordinate.y,
+          currentPlayer.mouse.x,
+          currentPlayer.mouse.y
+        );
+        currentPlayer.rotation = Math.atan2(vector.y, vector.x);
       });
 
       socket.on("shoot", (shootCord) => {
