@@ -16,18 +16,18 @@ export default class Game {
   }
 
   addPlayer(id, window, name, color) {
-    let player = new Player(id, window, name, color);
+    const player = new Player(id, window, name, color);
     this.players.push(player);
     return player;
   }
 
   addBullet(currentX, currentY, endX, endY, player) {
-    let bullet = new Bullet(currentX, currentY, endX, endY, player);
+    const bullet = new Bullet(currentX, currentY, endX, endY, player);
     this.bullets.push(bullet);
   }
 
   addBoost(window) {
-    let boost = new Boost(this.boosts.length+1, window, getRandomBoostType(), getRandomColor(), randomPosOnScreen(this.players));
+    const boost = new Boost(this.boosts.length+1, window, getRandomBoostType(), getRandomColor(), randomPosOnScreen(this.players));
     this.boosts.push(boost);
   }
 

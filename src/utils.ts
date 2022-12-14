@@ -19,7 +19,7 @@ export const random = function (min: number, max: number) {
 
 export const randomPosOnScreen = function(players) {
   //TODO A enlever avec la map dynamique
-  let min = minScreenSize(players);
+  const min = minScreenSize(players);
   return {
     x: random(
         0, min.width),
