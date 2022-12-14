@@ -2,7 +2,6 @@ import io from "socket.io-client";
 import Bullet from "../models/Bullet";
 import Boost from "../models/Boost";
 import Player from "../models/Player";
-
 const socket = io();
 const canvas: HTMLCanvasElement = document.getElementById(
   "app"
