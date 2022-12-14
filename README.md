@@ -85,8 +85,8 @@ npm run dev
 - [x] V0.1.3
 	- [x] Ajout de Typescript et webpack
 - [ ] V0.1.4
-	- [ ] ajout de nouveaux boostes avec des effets
-	- [ ] design des players, bullets et boosts
+	- [ ] restructure du code
+	- [x] design des players, bullets
 
 ## Idées pour la suite
 
