@@ -137,11 +137,19 @@ export default class ShooterServer {
       this.io.emit("update", { players: this.game.players });
 
       socket.on("moving", (playerMouvementInformation) => {
-        if (currentPlayer !== undefined)
-          currentPlayer.mouse = new Coordinate(
-            playerMouvementInformation.x,
-            playerMouvementInformation.y
-          );
+        if (currentPlayer === undefined) return;
+        currentPlayer.mouse = new Coordinate(
+          playerMouvementInformation.x,
+          playerMouvementInformation.y
+        );
+        //calculer la rotation du joeur par rapport à la souris
+        let vector = calcVector(
+          currentPlayer.coordinate.x,
+          currentPlayer.coordinate.y,
+          currentPlayer.mouse.x,
+          currentPlayer.mouse.y
+        );
+        currentPlayer.rotation = Math.atan2(vector.y, vector.x);
       });
 
       socket.on("shoot", (shootCord) => {

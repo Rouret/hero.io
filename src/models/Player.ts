@@ -9,6 +9,7 @@ export default class Player {
   speed: number;
   score: number;
   size: number;
+  rotation: number;
   clientDim: any;
   effect: any;
 
@@ -21,6 +22,7 @@ export default class Player {
     this.speed = 3;
     this.score = 0;
     this.size = 50;
+    this.rotation = 0;
     
     this.clientDim = {
       width: window.width,

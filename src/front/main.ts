@@ -38,6 +38,8 @@ const playerRunImage = document.getElementById(
   "player_run"
 ) as HTMLImageElement;
 
+const gunImage = document.getElementById("gun") as HTMLImageElement;
+
 elColor.value = color;
 //from the server
 let gameState: GameState = {
@@ -96,7 +98,9 @@ function drawPlayer(player: Player) {
 
   ctx.save();
   ctx.translate(player.coordinate.x, player.coordinate.y);
-  ctx.rotate(0);
+  if (Math.abs(player.rotation) > (Math.PI / 2)) {
+    ctx.scale(-1,1)
+  }
   ctx.drawImage(
     playerRunImage,
     playerRunImageFrameX,
@@ -110,6 +114,15 @@ function drawPlayer(player: Player) {
   );
 
   ctx.restore();
+
+  ctx.fillStyle = "black";
+  ctx.font = "20px Arial";
+  ctx.fillText(
+    player.name,
+    player.coordinate.x - player.name.length * 5,
+    player.coordinate.y - player.size / 2 - 10
+  );
+
 }
 
 function drawBullet(bullet: Bullet) {
