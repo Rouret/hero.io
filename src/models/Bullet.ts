@@ -7,6 +7,7 @@ export default class Bullet {
   end: Coordinate;
   color: string;
   speed: number;
+  size: number;
   isAlive: boolean;
   
   constructor(startX, startY, endX, endY, player) {
@@ -15,6 +16,7 @@ export default class Bullet {
     this.end = new Coordinate(endX, endY);
     this.color = this.player.color;
     this.speed = 10;
+    this.size = 10;
     this.isAlive = true;
   }
 }

@@ -29,7 +29,7 @@ export default class ShooterServer {
     this.publicFolder = "../dist";
     this.viewsFolder = "../views";
     this.tickrate = 60;
-    this.boostInterval = this.tickrate * 10;
+    this.boostInterval = this.tickrate;
     this._boostTimer = 0;
     this.taskLoop = [this._loopBullets, this._loopPlayers, this._loopBoosts];
   }

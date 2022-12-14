@@ -20,7 +20,7 @@ type GameState = {
 //GAME SETUP
 const BACKGROUND_COLOR = "#fff";
 let currentPlayer: Player;
-let cheat = true;
+let cheat = false;
 let frameIndex = 0;
 let username;
 let color = "#" + Math.floor(Math.random() * 16777215).toString(16);
@@ -37,6 +37,7 @@ const elLanding: HTMLDivElement = document.getElementById(
 const playerRunImage = document.getElementById(
   "player_run"
 ) as HTMLImageElement;
+const bulletImage = document.getElementById("bullet") as HTMLImageElement;
 
 const gunImage = document.getElementById("gun") as HTMLImageElement;
 
@@ -81,7 +82,7 @@ function goLesFumer() {
   username = elName.value;
   color = elColor.value;
   if (username.length === 0) {
-    username = "LE GROS CON";
+    username = "Unknown";
   }
   elLanding.style.display = "none";
   canvas.style.display = "block";
@@ -90,16 +91,21 @@ function goLesFumer() {
 }
 //Canvas
 function drawPlayer(player: Player) {
+  let coefAceSpped = Math.floor(player.speed / player.initSpeed);
+  let ajustedFPS = Math.floor(FPS / coefAceSpped);
+  let ajustedFrameIndex = frameIndex % ajustedFPS;
+
   let playerRunImageFrameIndex = Math.floor(
-    (frameIndex * playerRunImageFrame) / FPS
+    (ajustedFrameIndex * (playerRunImageFrame - 1)) / ajustedFPS
   );
+
   let playerRunImageFrameX =
     playerRunImageFrameIndex * playerRunImageFrameWidth;
 
   ctx.save();
   ctx.translate(player.coordinate.x, player.coordinate.y);
-  if (Math.abs(player.rotation) > (Math.PI / 2)) {
-    ctx.scale(-1,1)
+  if (Math.abs(player.rotation) > Math.PI / 2) {
+    ctx.scale(-1, 1);
   }
   ctx.drawImage(
     playerRunImage,
@@ -112,6 +118,13 @@ function drawPlayer(player: Player) {
     player.size,
     player.size
   );
+  ctx.restore();
+
+  //draw gun
+  ctx.save();
+  ctx.translate(player.coordinate.x, player.coordinate.y);
+  ctx.rotate(player.rotation);
+  ctx.drawImage(gunImage, -player.size / 2, -player.size / 2, 40, 20);
 
   ctx.restore();
 
@@ -122,12 +135,13 @@ function drawPlayer(player: Player) {
     player.coordinate.x - player.name.length * 5,
     player.coordinate.y - player.size / 2 - 10
   );
-
 }
 
 function drawBullet(bullet: Bullet) {
-  ctx.fillStyle = bullet.color;
-  ctx.fillRect(bullet.current.x - 2, bullet.current.y - 2, 10, 10);
+  ctx.save();
+  ctx.translate(bullet.current.x - 2, bullet.current.y - 2);
+  ctx.drawImage(bulletImage, 0, 0, bullet.size, bullet.size);
+  ctx.restore();
 
   //draw a line from the player to the bullet
   if (cheat) {

@@ -7,6 +7,7 @@ export default class Player {
   coordinate: Coordinate;
   mouse: Coordinate;
   speed: number;
+  initSpeed: number;
   score: number;
   size: number;
   rotation: number;
@@ -20,6 +21,7 @@ export default class Player {
     this.coordinate = new Coordinate(0, 0);
     this.mouse = new Coordinate(0, 0);
     this.speed = 3;
+    this.initSpeed = 3;
     this.score = 0;
     this.size = 50;
     this.rotation = 0;
@@ -35,10 +37,10 @@ export default class Player {
     for (let bullet of bullets) {
       if (
         bullet.player.id !== this.id &&
-        bullet.current.x >= this.coordinate.x - this.size / 2 &&
-        bullet.current.x <= this.coordinate.x + this.size / 2 &&
-        bullet.current.y >= this.coordinate.y - this.size / 2 &&
-        bullet.current.y <= this.coordinate.y + this.size / 2
+        this.coordinate.x >= bullet.current.x - bullet.size &&
+        this.coordinate.x <= bullet.current.x + bullet.size &&
+        this.coordinate.y >= bullet.current.y - bullet.size &&
+        this.coordinate.y <= bullet.current.y + bullet.size
       ) {
         return bullet;
       }
