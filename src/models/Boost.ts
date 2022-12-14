@@ -1,3 +1,5 @@
+import Dimension from "./Dimension";
+
 export default class Boost {
     id: string;
     type: string;
@@ -5,7 +7,7 @@ export default class Boost {
     size: number;
     x: number;
     y: number;
-    clientDim: any;
+    clientDim: Dimension;
 
     constructor(id, window, type, color, randomPosOnScreen) {
         this.id = id;
@@ -14,9 +16,6 @@ export default class Boost {
         this.x = randomPosOnScreen.x;
         this.y = randomPosOnScreen.y;
         this.size = 10;
-        this.clientDim = {
-            width: window.width,
-            height: window.height,
-        };
+        this.clientDim = new Dimension(window.width, window.height);
     }
 }
