@@ -17,7 +17,7 @@ export default class ShooterServer {
   viewsFolder: string;
   tickrate: number;
   boostInterval: number;
-  taskLoop: any;
+  taskLoop: Array<() => void>;
   _boostTimer: number;
 
   constructor() {
@@ -143,7 +143,7 @@ export default class ShooterServer {
           playerMouvementInformation.y
         );
         //calculer la rotation du joeur par rapport à la souris
-        let vector = calcVector(
+        const vector = calcVector(
           currentPlayer.coordinate.x,
           currentPlayer.coordinate.y,
           currentPlayer.mouse.x,

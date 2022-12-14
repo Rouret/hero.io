@@ -18,8 +18,7 @@ type GameState = {
 
 //GAME SETUP
 const BACKGROUND_COLOR = "#fff";
-let currentPlayer: Player;
-let cheat = false;
+const cheat = false;
 let frameIndex = 0;
 let username;
 let color = "#" + Math.floor(Math.random() * 16777215).toString(16);
@@ -90,15 +89,15 @@ function goLesFumer() {
 }
 //Canvas
 function drawPlayer(player: Player) {
-  let coefAceSpped = Math.floor(player.speed / player.initSpeed);
-  let ajustedFPS = Math.floor(FPS / coefAceSpped);
-  let ajustedFrameIndex = frameIndex % ajustedFPS;
+  const coefAceSpped = Math.floor(player.speed / player.initSpeed);
+  const ajustedFPS = Math.floor(FPS / coefAceSpped);
+  const ajustedFrameIndex = frameIndex % ajustedFPS;
 
-  let playerRunImageFrameIndex = Math.floor(
+  const playerRunImageFrameIndex = Math.floor(
     (ajustedFrameIndex * (playerRunImageFrame - 1)) / ajustedFPS
   );
 
-  let playerRunImageFrameX =
+  const playerRunImageFrameX =
     playerRunImageFrameIndex * playerRunImageFrameWidth;
 
   ctx.save();
