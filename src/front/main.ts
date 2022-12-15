@@ -2,6 +2,7 @@ import io from "socket.io-client";
 import Bullet from "../models/Bullet";
 import Boost from "../models/Boost";
 import Player from "../models/Player";
+import Dimension from '../models/Dimension';
 const socket = io();
 
 const canvas: HTMLCanvasElement = document.getElementById("app") as HTMLCanvasElement;
@@ -21,11 +22,7 @@ const BACKGROUND_COLOR = "#fff";
 const cheat = false;
 let frameIndex = 0;
 let username;
-let color = "#" + Math.floor(Math.random() * 16777215).toString(16);
 
-const elColor: HTMLInputElement = document.getElementById(
-  "color"
-) as HTMLInputElement;
 const elName: HTMLInputElement = document.getElementById(
   "name"
 ) as HTMLInputElement;
@@ -39,7 +36,6 @@ const bulletImage = document.getElementById("bullet") as HTMLImageElement;
 
 const gunImage = document.getElementById("gun") as HTMLImageElement;
 
-elColor.value = color;
 //from the server
 let gameState: GameState = {
   needToDraw: false,
@@ -78,7 +74,6 @@ elName.addEventListener("keyup", ({ key }) => {
 
 function goLesFumer() {
   username = elName.value;
-  color = elColor.value;
   if (username.length === 0) {
     username = "Unknown";
   }
@@ -146,7 +141,7 @@ function drawBullet(bullet: Bullet) {
     ctx.beginPath();
     ctx.moveTo(bullet.current.x, bullet.current.y);
     ctx.lineTo(bullet.end.x, bullet.end.y);
-    ctx.strokeStyle = bullet.color;
+    ctx.strokeStyle = "red";
     ctx.stroke();
   }
 }
@@ -243,12 +238,8 @@ function init() {
 
   //IO
   socket.emit("init", {
-    window: {
-      width: canvas.width,
-      height: canvas.height,
-    },
+    window: new Dimension(canvas.width, canvas.height),
     name: username,
-    color: color,
   });
   socket.on("update", (gameStateFromServer) => {
     gameState = { ...gameStateFromServer };

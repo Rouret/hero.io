@@ -1,9 +1,9 @@
 import {BoostTypes} from "./BoostTypes";
 import Coordinate from "./Coordinate";
+import Dimension from "./Dimension";
 export default class Player {
   id: string;
   name: string;
-  color: string;
   coordinate: Coordinate;
   mouse: Coordinate;
   speed: number;
@@ -11,13 +11,12 @@ export default class Player {
   score: number;
   size: number;
   rotation: number;
-  clientDim: any;
+  clientDim: Dimension;
   effect: any;
 
-  constructor(id, window, name, color) {
+  constructor(id, window, name) {
     this.id = id;
     this.name = name;
-    this.color = color;
     this.coordinate = new Coordinate(0, 0);
     this.mouse = new Coordinate(0, 0);
     this.speed = 3;
@@ -25,11 +24,7 @@ export default class Player {
     this.score = 0;
     this.size = 50;
     this.rotation = 0;
-    
-    this.clientDim = {
-      width: window.width,
-      height: window.height,
-    };
+    this.clientDim = new Dimension(window.width, window.height);
     this.effect = null;
   }
 

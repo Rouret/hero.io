@@ -15,8 +15,8 @@ export default class Game {
     this.boosts = [];
   }
 
-  addPlayer(id, window, name, color) {
-    const player = new Player(id, window, name, color);
+  addPlayer(id, window, name) {
+    const player = new Player(id, window, name);
     this.players.push(player);
     return player;
   }

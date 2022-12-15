@@ -126,8 +126,7 @@ export default class ShooterServer {
         currentPlayer = this.game.addPlayer(
           socket.id,
           data.window,
-          data.name.slice(0, 15),
-          data.color
+          data.name.slice(0, 15)
         );
       });
       socket.emit("newPlayer", currentPlayer);
