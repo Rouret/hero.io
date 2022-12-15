@@ -2,10 +2,14 @@ import io from "socket.io-client";
 import Bullet from "../models/Bullet";
 import Boost from "../models/Boost";
 import Player from "../models/Player";
-import Dimension from '../models/Dimension';
+import Dimension from "../models/Dimension";
+import Coordinate from "../models/Coordinate";
+import { calcVector,getDistanceOfVector } from "../utils";
 const socket = io();
 
-const canvas: HTMLCanvasElement = document.getElementById("app") as HTMLCanvasElement;
+const canvas: HTMLCanvasElement = document.getElementById(
+  "app"
+) as HTMLCanvasElement;
 const ctx: CanvasRenderingContext2D = canvas.getContext("2d");
 const FPS = 60;
 const timePerTick = 1000 / FPS;
@@ -19,10 +23,13 @@ type GameState = {
 
 //GAME SETUP
 const BACKGROUND_COLOR = "#fff";
-const cheat = false;
+const cheat = true;
 let frameIndex = 0;
 let username;
+let currentPlayer: Player;
+let worldDimension: Dimension;
 
+//HTML elements
 const elName: HTMLInputElement = document.getElementById(
   "name"
 ) as HTMLInputElement;
@@ -32,8 +39,12 @@ const elLanding: HTMLDivElement = document.getElementById(
 const playerRunImage = document.getElementById(
   "player_run"
 ) as HTMLImageElement;
-const bulletImage = document.getElementById("bullet") as HTMLImageElement;
+const elButton: HTMLButtonElement = document.getElementById(
+  "start"
+) as HTMLButtonElement;
 
+//Assets
+const bulletImage = document.getElementById("bullet") as HTMLImageElement;
 const gunImage = document.getElementById("gun") as HTMLImageElement;
 
 //from the server
@@ -44,17 +55,8 @@ let gameState: GameState = {
   boosts: [],
 };
 //local mouse position
-const mouse = {
-  current: {
-    x: 0,
-    y: 0,
-  },
-  previous: {
-    x: 0,
-    y: 0,
-  },
-};
-//config player
+let mouse = new Coordinate(0, 0);
+//Config player animation
 const playerRunImageWidth = 280;
 const playerRunImageHeight = 40;
 const playerRunImageFrame = 7;
@@ -62,9 +64,7 @@ const playerRunImageFrameWidth = playerRunImageWidth / playerRunImageFrame;
 const playerRunImageFrameHeight = playerRunImageHeight;
 const playerRunImageFrameY = 0;
 
-const elButton: HTMLButtonElement = document.getElementById(
-  "start"
-) as HTMLButtonElement;
+//Listeners landing page
 elButton.addEventListener("click", goLesFumer);
 elName.addEventListener("keyup", ({ key }) => {
   if (key === "Enter") {
@@ -82,7 +82,8 @@ function goLesFumer() {
 
   init();
 }
-//Canvas
+
+//Draw
 function drawPlayer(player: Player) {
   const coefAceSpped = Math.floor(player.speed / player.initSpeed);
   const ajustedFPS = Math.floor(FPS / coefAceSpped);
@@ -121,6 +122,15 @@ function drawPlayer(player: Player) {
 
   ctx.restore();
 
+  //draw line between player and mouse
+  if (cheat) {
+    ctx.beginPath();
+    ctx.moveTo(player.coordinate.x, player.coordinate.y);
+    ctx.lineTo(mouse.x, mouse.y);
+    ctx.strokeStyle = "red";
+    ctx.stroke();
+  }
+
   ctx.fillStyle = "black";
   ctx.font = "20px Arial";
   ctx.fillText(
@@ -146,16 +156,16 @@ function drawBullet(bullet: Bullet) {
   }
 }
 
-function drawBoost(boost: Boost) {
-  ctx.fillStyle = boost.color;
-  const saveFillStyle = ctx.fillStyle;
-  ctx.beginPath();
-  ctx.fillStyle = boost.color;
-  ctx.arc(boost.x, boost.y, boost.size, 0, 2 * Math.PI);
-  ctx.closePath();
-  ctx.fill();
-  ctx.fillStyle = saveFillStyle;
-}
+// function drawBoost(boost: Boost) {
+//   ctx.fillStyle = boost.color;
+//   const saveFillStyle = ctx.fillStyle;
+//   ctx.beginPath();
+//   ctx.fillStyle = boost.color;
+//   ctx.arc(boost.x, boost.y, boost.size, 0, 2 * Math.PI);
+//   ctx.closePath();
+//   ctx.fill();
+//   ctx.fillStyle = saveFillStyle;
+// }
 
 function drawLeaderboard() {
   ctx.fillStyle = "black";
@@ -191,12 +201,34 @@ function draw() {
     gameState.bullets.forEach(drawBullet);
 
     //draw boosts
-    gameState.boosts.forEach(drawBoost);
+    //gameState.boosts.forEach(drawBoost);
 
     drawLeaderboard();
 
     gameState.needToDraw = false;
   }
+}
+
+function convertToCanvasCoordinate(
+  objectCoordinate: Coordinate,
+  currentPlayer: Player
+): Coordinate {
+  const x =
+    objectCoordinate.x - (currentPlayer.coordinate.x - canvas.width / 2);
+  const y =
+    objectCoordinate.y - (currentPlayer.coordinate.y - canvas.height / 2);
+  return new Coordinate(x, y);
+}
+
+function convertToGameCoordinate(
+  objectCoordinate: Coordinate,
+  currentPlayer: Player
+): Coordinate {
+  const x =
+    objectCoordinate.x + (currentPlayer.coordinate.x - canvas.width / 2);
+  const y =
+    objectCoordinate.y + (currentPlayer.coordinate.y - canvas.height / 2);
+  return new Coordinate(x, y);
 }
 
 function init() {
@@ -206,23 +238,32 @@ function init() {
   //Detect mouse movement
   document.addEventListener("keyup", (event) => {
     if (event.key === " ") {
-      socket.emit("shoot", { x: mouse.current.x, y: mouse.current.y });
+      socket.emit("shoot", { x: mouse.x, y: mouse.y });
     }
   });
 
   canvas.addEventListener(
     "mousemove",
     function (event) {
-      mouse.current.x = event.clientX;
-      mouse.current.y = event.clientY;
+      mouse = new Coordinate(event.clientX, event.clientY);
+      const mouseWorldCoordinate = convertToGameCoordinate(
+        mouse,
+        currentPlayer
+      );
 
-      if (
-        mouse.current.x !== mouse.previous.x ||
-        mouse.current.y !== mouse.previous.y
-      ) {
-        socket.emit("moving", mouse.current);
-        mouse.previous = { ...mouse.current };
+      const vector = calcVector(
+        currentPlayer.coordinate.x,
+        currentPlayer.coordinate.y,
+        mouseWorldCoordinate.x,
+        mouseWorldCoordinate.y
+      );
+
+      let rotation = Math.acos(vector.x / getDistanceOfVector(vector));
+      if(vector.y > 0) {
+        rotation = -rotation;
       }
+
+      socket.emit("moving", rotation);
     },
     false
   );
@@ -241,9 +282,38 @@ function init() {
     window: new Dimension(canvas.width, canvas.height),
     name: username,
   });
+
+  socket.on("welcome", (metadataFromServer) => {
+    console.log("MetaData from server: ", metadataFromServer);
+    currentPlayer = metadataFromServer.currentPlayer;
+    worldDimension = metadataFromServer.worldDimension;
+  });
+
   socket.on("update", (gameStateFromServer) => {
     gameState = { ...gameStateFromServer };
+
+    const currentPlayer = gameState.players.find(
+      (player) => player.id === socket.id
+    );
+
+    gameState.players.map((player) => {
+      console.log(player.coordinate);
+      player.coordinate = convertToCanvasCoordinate(
+        player.coordinate,
+        currentPlayer
+      );
+
+      return player;
+    });
+
+    gameState.bullets.map((bullet) => {
+      bullet.current = convertToCanvasCoordinate(bullet.current, currentPlayer);
+      bullet.end = convertToCanvasCoordinate(bullet.end, currentPlayer); //only for cheat
+      return bullet;
+    });
+
     gameState.needToDraw = true;
+    draw();
   });
 
   if (canvas.getContext("2d")) {

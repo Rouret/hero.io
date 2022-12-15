@@ -1,22 +1,27 @@
 import Player from './Player';
 import Bullet from './Bullet';
 import Boost from "./Boost";
-import {randomPosOnScreen, getRandomColor} from '../utils';
+import { randomPosOnScreen, getRandomColor, random } from '../utils';
 import { getRandomBoostType} from './BoostTypes';
+import Dimension from './Dimension';
+import Coordinate from './Coordinate';
 
 export default class Game {
   players: Player[];
   bullets: Bullet[];
   boosts: Boost[];
+  worldDimension: Dimension;
 
   constructor() {
     this.players = [];
     this.bullets = [];
     this.boosts = [];
+    this.worldDimension = new Dimension(4000, 4000);
   }
 
   addPlayer(id, window, name) {
-    const player = new Player(id, window, name);
+    const playerCoordinate = new Coordinate(random(0, this.worldDimension.width), random(0, this.worldDimension.height))
+    const player = new Player(id, window, name, playerCoordinate);
     this.players.push(player);
     return player;
   }

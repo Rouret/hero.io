@@ -3,7 +3,12 @@ import path from "path";
 import http from "http";
 import { Server, Socket } from "socket.io";
 import Game from "./models/Game";
-import { calcVector, getDistanceOfVector, randomPosOnScreen } from "./utils";
+import {
+  calcVector,
+  getDistanceOfVector,
+  random,
+  randomPosOnScreen,
+} from "./utils";
 import Coordinate from "./models/Coordinate";
 import Player from "./models/Player";
 
@@ -66,29 +71,13 @@ export default class ShooterServer {
 
         this.game.players.find((p) => p.id !== playerId).score++;
 
-        const randomCoords = randomPosOnScreen(this.game.players);
-        player.coordinate.x = randomCoords.x;
-        player.coordinate.y = randomCoords.y;
+        const playerCoordinate = new Coordinate(
+          random(0, this.game.worldDimension.width),
+          random(0, this.game.worldDimension.height)
+        );
+        player.coordinate = playerCoordinate;
         player.removeEffect();
       }
-
-      const vector = calcVector(
-        player.coordinate.x,
-        player.coordinate.y,
-        player.mouse.x,
-        player.mouse.y
-      );
-      const distance = getDistanceOfVector(vector);
-
-      const coef = distance / player.speed;
-      if (coef > 1) {
-        player.coordinate.x += vector.x / coef;
-        player.coordinate.y += vector.y / coef;
-      } else {
-        player.coordinate.x = player.mouse.x;
-        player.coordinate.y = player.mouse.y;
-      }
-
       const boostCollided = player.isCollidingWithBoost(this.game.boosts);
       if (boostCollided !== null) {
         player.setEffect(boostCollided);
@@ -101,12 +90,12 @@ export default class ShooterServer {
 
   _loopBoosts() {
     // Generate boosts
-    this._boostTimer++;
-    if (this._boostTimer >= this.boostInterval) {
-      const randomPos = randomPosOnScreen(this.game.players);
-      this.game.addBoost(randomPos);
-      this._boostTimer = 0;
-    }
+    // this._boostTimer++;
+    // if (this._boostTimer >= this.boostInterval) {
+    //   const randomPos = randomPosOnScreen(this.game.players);
+    //   this.game.addBoost(randomPos);
+    //   this._boostTimer = 0;
+    // }
   }
 
   _setupExpress() {
@@ -128,30 +117,40 @@ export default class ShooterServer {
           data.window,
           data.name.slice(0, 15)
         );
+
+        socket.emit("welcome", {
+          worldDimension: this.game.worldDimension,
+          currentPlayer: currentPlayer,
+        });
       });
-      socket.emit("newPlayer", currentPlayer);
-      //On envoye au client ses données
 
       //send the players object to the new player
       this.io.emit("update", { players: this.game.players });
 
-      socket.on("moving", (playerMouvementInformation) => {
+      socket.on("moving", (rotation) => {
         if (currentPlayer === undefined) return;
-        currentPlayer.mouse = new Coordinate(
-          playerMouvementInformation.x,
-          playerMouvementInformation.y
+
+        currentPlayer.rotation = rotation;
+
+        const newPlayerCoordinate = new Coordinate(
+          currentPlayer.coordinate.x + Math.cos(rotation) * currentPlayer.speed,
+          currentPlayer.coordinate.y + Math.sin(rotation) * currentPlayer.speed
         );
-        //calculer la rotation du joeur par rapport à la souris
-        const vector = calcVector(
-          currentPlayer.coordinate.x,
-          currentPlayer.coordinate.y,
-          currentPlayer.mouse.x,
-          currentPlayer.mouse.y
-        );
-        currentPlayer.rotation = Math.atan2(vector.y, vector.x);
+
+        if (
+          newPlayerCoordinate.x < 0 ||
+          newPlayerCoordinate.x > this.game.worldDimension.width ||
+          newPlayerCoordinate.y < 0 ||
+          newPlayerCoordinate.y > this.game.worldDimension.height
+        ) {
+          return;
+        }
+
+        currentPlayer.coordinate = newPlayerCoordinate;
       });
 
       socket.on("shoot", (shootCord) => {
+        if (currentPlayer === undefined) return;
         this.game.addBullet(
           currentPlayer.coordinate.x,
           currentPlayer.coordinate.y,

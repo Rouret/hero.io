@@ -5,7 +5,6 @@ export default class Player {
   id: string;
   name: string;
   coordinate: Coordinate;
-  mouse: Coordinate;
   speed: number;
   initSpeed: number;
   score: number;
@@ -14,16 +13,16 @@ export default class Player {
   clientDim: Dimension;
   effect: any;
 
-  constructor(id, window, name) {
+  constructor(id : string, window:Dimension, name:string, coordinate : Coordinate) {
     this.id = id;
     this.name = name;
-    this.coordinate = new Coordinate(0, 0);
-    this.mouse = new Coordinate(0, 0);
-    this.speed = 3;
+    this.coordinate = coordinate;
+    this.speed = 1;
     this.initSpeed = 3;
     this.score = 0;
     this.size = 50;
     this.rotation = 0;
+    
     this.clientDim = new Dimension(window.width, window.height);
     this.effect = null;
   }
