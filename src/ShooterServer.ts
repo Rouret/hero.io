@@ -7,7 +7,6 @@ import {
   calcVector,
   getDistanceOfVector,
   random,
-  randomPosOnScreen,
 } from "./utils";
 import Coordinate from "./models/Coordinate";
 import Player from "./models/Player";
@@ -134,7 +133,7 @@ export default class ShooterServer {
 
         const newPlayerCoordinate = new Coordinate(
           currentPlayer.coordinate.x + Math.cos(rotation) * currentPlayer.speed,
-          currentPlayer.coordinate.y + Math.sin(rotation) * currentPlayer.speed
+          currentPlayer.coordinate.y - Math.sin(rotation) * currentPlayer.speed
         );
 
         if (

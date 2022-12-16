@@ -4,7 +4,7 @@ import Boost from "../models/Boost";
 import Player from "../models/Player";
 import Dimension from "../models/Dimension";
 import Coordinate from "../models/Coordinate";
-import { calcVector,getDistanceOfVector } from "../utils";
+import { calcVector, getDistanceOfVector } from "../utils";
 const socket = io();
 
 const canvas: HTMLCanvasElement = document.getElementById(
@@ -63,6 +63,9 @@ const playerRunImageFrame = 7;
 const playerRunImageFrameWidth = playerRunImageWidth / playerRunImageFrame;
 const playerRunImageFrameHeight = playerRunImageHeight;
 const playerRunImageFrameY = 0;
+//Config Minimap
+const miniMapSize = 400;
+let miniMapRatio = 0.05;
 
 //Listeners landing page
 elButton.addEventListener("click", goLesFumer);
@@ -181,6 +184,41 @@ function drawLeaderboard() {
   });
 }
 
+function drawMiniMap() {
+  const miniMapPlayerSize = currentPlayer.size * miniMapRatio;
+  const miniMapPlayerX = currentPlayer.coordinate.x * miniMapRatio;
+  const miniMapPlayerY = currentPlayer.coordinate.y * miniMapRatio;
+
+  //Mini map
+  ctx.save();
+  ctx.translate(canvas.width - miniMapSize, canvas.height - miniMapSize);
+  ctx.fillStyle = "white";
+  ctx.fillRect(0, 0, miniMapSize, miniMapSize);
+  ctx.fillStyle = "black";
+  ctx.fillRect(0, 0, miniMapSize, 1);
+  ctx.fillRect(0, 0, 1, miniMapSize);
+  ctx.fillRect(miniMapSize - 1, 0, 1, miniMapSize);
+  ctx.fillRect(0, miniMapSize - 1, miniMapSize, 1);
+
+  //Client scrren
+  ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+  ctx.fillRect(
+    miniMapPlayerX - (canvas.width* miniMapRatio) / 2,
+    miniMapPlayerY - (canvas.height* miniMapRatio) / 2,
+    canvas.width * miniMapRatio,
+    canvas.height * miniMapRatio
+  );
+
+  //CurrentPlayer
+  ctx.fillStyle = "red";
+  ctx.beginPath();
+  ctx.arc(miniMapPlayerX, miniMapPlayerY, miniMapPlayerSize, 0, 2 * Math.PI);
+  ctx.closePath();
+
+  ctx.fill();
+  ctx.restore();
+}
+
 function draw() {
   if (frameIndex === FPS) {
     frameIndex = 0;
@@ -202,6 +240,8 @@ function draw() {
 
     //draw boosts
     //gameState.boosts.forEach(drawBoost);
+
+    drawMiniMap();
 
     drawLeaderboard();
 
@@ -259,7 +299,7 @@ function init() {
       );
 
       let rotation = Math.acos(vector.x / getDistanceOfVector(vector));
-      if(vector.y > 0) {
+      if (vector.y > 0) {
         rotation = -rotation;
       }
 
@@ -287,17 +327,18 @@ function init() {
     console.log("MetaData from server: ", metadataFromServer);
     currentPlayer = metadataFromServer.currentPlayer;
     worldDimension = metadataFromServer.worldDimension;
+    miniMapRatio = miniMapSize / worldDimension.width;
   });
 
   socket.on("update", (gameStateFromServer) => {
     gameState = { ...gameStateFromServer };
 
-    const currentPlayer = gameState.players.find(
-      (player) => player.id === socket.id
+    currentPlayer = Object.assign(
+      {},
+      gameState.players.find((player) => player.id === currentPlayer.id)
     );
 
     gameState.players.map((player) => {
-      console.log(player.coordinate);
       player.coordinate = convertToCanvasCoordinate(
         player.coordinate,
         currentPlayer

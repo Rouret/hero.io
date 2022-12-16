@@ -18,7 +18,7 @@ export default class Player {
     this.name = name;
     this.coordinate = coordinate;
     this.speed = 1;
-    this.initSpeed = 3;
+    this.initSpeed = 1;
     this.score = 0;
     this.size = 50;
     this.rotation = 0;
