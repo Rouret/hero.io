@@ -16,7 +16,7 @@ export default class Game {
         this.players = [];
         this.bullets = [];
         this.boosts = [];
-        this.worldDimension = new Dimension(4000, 4000);
+        this.worldDimension = new Dimension(3000, 3000);
     }
 
     addPlayer(id, window, name) {

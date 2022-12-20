@@ -12,19 +12,16 @@ const canvas: HTMLCanvasElement = document.getElementById(
     "app"
 ) as HTMLCanvasElement;
 const ctx: CanvasRenderingContext2D = canvas.getContext("2d");
-const FPS = 60;
-const timePerTick = 1000 / FPS;
 
+
+//GAME SETUP
 type GameState = {
     needToDraw: boolean;
     players: Player[];
     bullets: Bullet[];
     boosts: Boost[];
 };
-
-//GAME SETUP
-const BACKGROUND_COLOR = "#fff";
-const cheat = true;
+let mouse = new Coordinate(0, 0);
 let frameIndex = 0;
 let username;
 let currentPlayer: Player;
@@ -44,10 +41,6 @@ const elButton: HTMLButtonElement = document.getElementById(
     "start"
 ) as HTMLButtonElement;
 
-//Assets
-const bulletImage = document.getElementById("bullet") as HTMLImageElement;
-const gunImage = document.getElementById("gun") as HTMLImageElement;
-
 //from the server
 let gameState: GameState = {
     needToDraw: false,
@@ -56,25 +49,34 @@ let gameState: GameState = {
     boosts: [],
 };
 //local mouse position
-let mouse = new Coordinate(0, 0);
-//Config player animation
-const playerRunImageWidth = 280;
-const playerRunImageHeight = 40;
-const playerRunImageFrame = 7;
-const playerRunImageFrameWidth = playerRunImageWidth / playerRunImageFrame;
-const playerRunImageFrameHeight = playerRunImageHeight;
-const playerRunImageFrameY = 0;
-//Config Minimap
-const miniMapSize = 400;
-let miniMapRatio = 0.05;
-//Debug
 const gameSettings = {
     showMiniMap: true,
     showLeaderboard: false,
     bullets: false,
     players: true,
     boosts: false,
-    limitWall: 20
+    limitWall: 20,
+    fps: 60,
+    timePerTick: 0, //calculated in init
+    BACKGROUND_COLOR: "#fff",
+    cheat: true,
+    assets: {
+        bulletImage: document.getElementById("bullet") as HTMLImageElement,
+        gunImage: document.getElementById("gun") as HTMLImageElement
+    },
+    player: {
+        animation: {
+            playerRunImageWidth: 280,
+            playerRunImageHeight: 40,
+            playerRunImageFrame: 7,
+            playerRunImageFrameWidth: 0, //calculated in init
+            playerRunImageFrameY: 0,
+        }
+    },
+    minimap: {
+        miniMapSize: 400,
+        miniMapRatio: 0.05
+    }
 }
 
 //Listeners landing page
@@ -99,15 +101,15 @@ function goLesFumer() {
 //Draw
 function drawPlayer(player: Player) {
     const coefAceSpped = Math.floor(player.speed / player.initSpeed);
-    const ajustedFPS = Math.floor(FPS / coefAceSpped);
+    const ajustedFPS = Math.floor(gameSettings.fps / coefAceSpped);
     const ajustedFrameIndex = frameIndex % ajustedFPS;
 
     const playerRunImageFrameIndex = Math.floor(
-        (ajustedFrameIndex * (playerRunImageFrame - 1)) / ajustedFPS
+        (ajustedFrameIndex * (gameSettings.player.animation.playerRunImageFrame - 1)) / ajustedFPS
     );
 
     const playerRunImageFrameX =
-        playerRunImageFrameIndex * playerRunImageFrameWidth;
+        playerRunImageFrameIndex * gameSettings.player.animation.playerRunImageFrameWidth;
 
     ctx.save();
     ctx.translate(player.coordinate.x, player.coordinate.y);
@@ -117,9 +119,9 @@ function drawPlayer(player: Player) {
     ctx.drawImage(
         playerRunImage,
         playerRunImageFrameX,
-        playerRunImageFrameY,
-        playerRunImageFrameWidth,
-        playerRunImageFrameHeight,
+        gameSettings.player.animation.playerRunImageFrameY,
+        gameSettings.player.animation.playerRunImageFrameWidth,
+        gameSettings.player.animation.playerRunImageHeight,
         -player.size / 2,
         -player.size / 2,
         player.size,
@@ -131,12 +133,12 @@ function drawPlayer(player: Player) {
     ctx.save();
     ctx.translate(player.coordinate.x, player.coordinate.y);
     ctx.rotate(player.rotation);
-    ctx.drawImage(gunImage, -player.size / 2, -player.size / 2, 40, 20);
+    ctx.drawImage(gameSettings.assets.gunImage, -player.size / 2, -player.size / 2, 40, 20);
 
     ctx.restore();
 
     //draw line between player and mouse
-    if (cheat) {
+    if (gameSettings.cheat) {
         ctx.beginPath();
         ctx.moveTo(player.coordinate.x, player.coordinate.y);
         ctx.lineTo(mouse.x, mouse.y);
@@ -166,11 +168,11 @@ function drawBullet(bullet: Bullet) {
     );
     ctx.save();
     ctx.translate(currentCoordinateCanvas.x, currentCoordinateCanvas.y);
-    ctx.drawImage(bulletImage, 0, 0, bullet.size, bullet.size);
+    ctx.drawImage(gameSettings.assets.bulletImage, 0, 0, bullet.size, bullet.size);
     ctx.restore();
 
     //draw a line from the player to the bullet
-    if (cheat) {
+    if (gameSettings.cheat) {
         ctx.beginPath();
         ctx.moveTo(currentCoordinateCanvas.x, currentCoordinateCanvas.y);
         ctx.lineTo(endCoordinateCanvas.x, endCoordinateCanvas.y);
@@ -205,28 +207,28 @@ function drawLeaderboard() {
 }
 
 function drawMiniMap() {
-    const miniMapPlayerSize = currentPlayer.size * miniMapRatio;
-    const miniMapPlayerX = currentPlayer.coordinate.x * miniMapRatio;
-    const miniMapPlayerY = currentPlayer.coordinate.y * miniMapRatio;
+    const miniMapPlayerSize = currentPlayer.size * gameSettings.minimap.miniMapRatio;
+    const miniMapPlayerX = currentPlayer.coordinate.x * gameSettings.minimap.miniMapRatio;
+    const miniMapPlayerY = currentPlayer.coordinate.y * gameSettings.minimap.miniMapRatio;
 
     //Mini map
     ctx.save();
-    ctx.translate(canvas.width - miniMapSize, canvas.height - miniMapSize);
+    ctx.translate(canvas.width - gameSettings.minimap.miniMapSize, canvas.height - gameSettings.minimap.miniMapSize);
     ctx.fillStyle = "white";
-    ctx.fillRect(0, 0, miniMapSize, miniMapSize);
+    ctx.fillRect(0, 0, gameSettings.minimap.miniMapSize, gameSettings.minimap.miniMapSize);
     ctx.fillStyle = "black";
-    ctx.fillRect(0, 0, miniMapSize, 1);
-    ctx.fillRect(0, 0, 1, miniMapSize);
-    ctx.fillRect(miniMapSize - 1, 0, 1, miniMapSize);
-    ctx.fillRect(0, miniMapSize - 1, miniMapSize, 1);
+    ctx.fillRect(0, 0, gameSettings.minimap.miniMapSize, 1);
+    ctx.fillRect(0, 0, 1, gameSettings.minimap.miniMapSize);
+    ctx.fillRect(gameSettings.minimap.miniMapSize - 1, 0, 1, gameSettings.minimap.miniMapSize);
+    ctx.fillRect(0, gameSettings.minimap.miniMapSize - 1, gameSettings.minimap.miniMapSize, 1);
 
     //Client scrren
     ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
     ctx.fillRect(
-        miniMapPlayerX - (canvas.width * miniMapRatio) / 2,
-        miniMapPlayerY - (canvas.height * miniMapRatio) / 2,
-        canvas.width * miniMapRatio,
-        canvas.height * miniMapRatio
+        miniMapPlayerX - (canvas.width * gameSettings.minimap.miniMapRatio) / 2,
+        miniMapPlayerY - (canvas.height * gameSettings.minimap.miniMapRatio) / 2,
+        canvas.width * gameSettings.minimap.miniMapRatio,
+        canvas.height * gameSettings.minimap.miniMapRatio
     );
 
     //CurrentPlayer
@@ -238,7 +240,6 @@ function drawMiniMap() {
     ctx.fill();
     ctx.restore();
 }
-
 
 function drawMap() {
     const topLeft = new Coordinate(
@@ -280,7 +281,7 @@ function drawMap() {
 }
 
 function draw() {
-    if (frameIndex === FPS) {
+    if (frameIndex === gameSettings.fps) {
         frameIndex = 0;
     } else {
         frameIndex++;
@@ -289,7 +290,7 @@ function draw() {
         // clear canvas
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         // draw background
-        ctx.fillStyle = BACKGROUND_COLOR;
+        ctx.fillStyle = gameSettings.BACKGROUND_COLOR;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         // draw players
@@ -307,6 +308,8 @@ function draw() {
             gameState.boosts.forEach(drawBoost);
         }
 
+        drawMap();
+
         if (gameSettings.showMiniMap) {
             drawMiniMap();
         }
@@ -314,9 +317,6 @@ function draw() {
         if (gameSettings.showLeaderboard) {
             drawLeaderboard();
         }
-
-        drawMap();
-
 
         gameState.needToDraw = false;
     }
@@ -371,8 +371,9 @@ function init() {
     //SETUP
     canvas.width = window.document.documentElement.clientWidth;
     canvas.height = window.document.documentElement.clientHeight - 1;
-    //Detect mouse movement
-
+    //Calculate
+    gameSettings.player.animation.playerRunImageFrameWidth = gameSettings.player.animation.playerRunImageWidth / gameSettings.player.animation.playerRunImageFrame
+    gameSettings.timePerTick = 1000 / gameSettings.fps;
 
     if (gameSettings.players) {
         canvas.addEventListener(
@@ -384,8 +385,7 @@ function init() {
         );
     }
 
-
-    //detect click
+    //Shoot Event
     if (gameSettings.bullets) {
         document.addEventListener("keyup", (event) => {
             if (event.key === " ") {
@@ -412,7 +412,7 @@ function init() {
         console.log("MetaData from server: ", metadataFromServer);
         currentPlayer = metadataFromServer.currentPlayer;
         worldDimension = metadataFromServer.worldDimension;
-        miniMapRatio = miniMapSize / worldDimension.width;
+        gameSettings.minimap.miniMapRatio = gameSettings.minimap.miniMapSize / worldDimension.width;
     });
 
     socket.on("update", (gameStateFromServer) => {
@@ -434,7 +434,6 @@ function init() {
             });
         }
 
-
         if (gameSettings.bullets) {
             gameState.bullets.map((bullet) => {
                 bullet.current = convertToCanvasCoordinate(bullet.current, currentPlayer);
@@ -443,13 +442,12 @@ function init() {
             });
         }
 
-
         gameState.needToDraw = true;
         draw();
     });
 
     if (canvas.getContext("2d")) {
         console.log("Game is ready 😊");
-        setInterval(draw, timePerTick);
+        setInterval(draw, gameSettings.timePerTick);
     }
 }
