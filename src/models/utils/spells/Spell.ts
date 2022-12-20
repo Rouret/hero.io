@@ -1,5 +1,7 @@
-import Effect from "./effects/Effect";
-import Shape from "./shapes/Shape";
+import Effect from "../effects/Effect";
+import Shape from "../shapes/Shape";
+import {SpellType} from "./SpellType";
+import {SpellAction} from "./SpellAction";
 
 export default class Spell {
     public name: string;
@@ -8,6 +10,8 @@ export default class Spell {
     public damage: number;
     public shape: Shape;
     public effect: Effect;
+    public type: SpellType;
+    public action: SpellAction;
 
     public constructor(
         name: string,
@@ -16,7 +20,9 @@ export default class Spell {
         cooldown: number,
         damage: number,
         shape: Shape,
-        effect: Effect
+        effect: Effect,
+        type: SpellType,
+        action: SpellAction
     ) {
         this.name = name;
         this.description = description;
@@ -24,5 +30,7 @@ export default class Spell {
         this.damage = damage;
         this.shape = shape;
         this.effect = effect;
+        this.type = type;
+        this.action = action;
     }
 }

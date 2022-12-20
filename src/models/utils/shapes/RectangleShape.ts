@@ -3,8 +3,9 @@ import Coordinate from "../Coordinate";
 import Vector from "../Vector";
 
 export default class RectangleShape implements Shape {
-    private length: number;
-    private width: number;
+    name = "RectangleShape";
+    public length: number;
+    public width: number;
 
     constructor(length: number, width: number) {
         this.length = length;

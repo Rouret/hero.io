@@ -4,6 +4,7 @@ import Vector from "../Vector";
 
 export default class SemiCircleShape implements Shape {
     public radius: number;
+    name = "SemiCircleShape";
 
     public constructor(radius: number) {
         this.radius = radius
@@ -29,7 +30,7 @@ export default class SemiCircleShape implements Shape {
         if (directorVector.getMagnitude() < playerVector.getMagnitude()) {
             return false;
         }
-        
+
         const angle = Math.acos(
             (directorVector.x * playerVector.x + directorVector.y * playerVector.y) /
             (directorVector.getMagnitude() * playerVector.getMagnitude())

@@ -4,6 +4,8 @@ import http from "http";
 import {Server, Socket} from "socket.io";
 import Game from "./models/Game";
 import Player from "./models/Player";
+import SpellInvocation from "./models/utils/spells/SpellInvocation";
+import SpecialInvocation from "./models/utils/specials/SpecialInvocation";
 
 export default class ShooterServer {
     app: express.Application;
@@ -56,7 +58,6 @@ export default class ShooterServer {
                     data.name.slice(0, 15)
                 );
 
-
                 socket.emit("welcome", {
                     worldDimension: this.game.worldDimension,
                     currentPlayer: currentPlayer,
@@ -66,6 +67,16 @@ export default class ShooterServer {
             socket.on("moving", (rotation) => {
                 if (currentPlayer === undefined) return;
                 currentPlayer.rotation = rotation;
+            });
+
+            socket.on("spell", (spellInvocation: SpellInvocation) => {
+                if (currentPlayer === undefined) return;
+                console.log("spell:", spellInvocation.spell.name);
+            });
+
+            socket.on("special", (specialInvocation: SpecialInvocation) => {
+                if (currentPlayer === undefined) return;
+                console.log("special:", specialInvocation.special.name);
             });
 
             socket.on("disconnect", () => {

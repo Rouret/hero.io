@@ -1,8 +1,8 @@
 import Coordinate from "./utils/Coordinate";
 import Dimension from "./utils/Dimension";
 import Game from "./Game";
-import Spell from "./utils/Spell";
-import Special from "./utils/spells/Special";
+import Spell from "./utils/spells/Spell";
+import Special from "./utils/specials/Special";
 
 export default abstract class Player {
     public id: string;

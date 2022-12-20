@@ -3,7 +3,8 @@ import Shape from "./Shape";
 import Vector from "../Vector";
 
 export default class CircleShape implements Shape {
-    private radius: number;
+    name = "CircleShape";
+    public radius: number;
 
     constructor(radius: number) {
         this.radius = radius;

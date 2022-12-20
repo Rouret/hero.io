@@ -3,6 +3,14 @@ import Player from "../models/Player";
 import Dimension from "../models/utils/Dimension";
 import Coordinate from "../models/utils/Coordinate";
 import Vector from "../models/utils/Vector";
+import SpellInvocation from "../models/utils/spells/SpellInvocation";
+import Spell from "../models/utils/spells/Spell";
+import {SpellAction} from "../models/utils/spells/SpellAction";
+import {SpellType} from "../models/utils/spells/SpellType";
+import SpecialInvocation from "../models/utils/specials/SpecialInvocation";
+import SemiCircleShape from "../models/utils/shapes/SemiCircleShape";
+import CircleShape from "../models/utils/shapes/CircleShape";
+import RectangleShape from "../models/utils/shapes/RectangleShape";
 
 const socket = io();
 
@@ -62,7 +70,12 @@ const gameSettings = {
             playerRunImageFrameY: 0,
         },
         move: {
-            delay: 0//calculated in init
+            delay: 0 //calculated in init
+        },
+        bind: {
+            spell1: "a",
+            spell2: "z",
+            special: "c",
         }
     },
     minimap: {
@@ -323,6 +336,126 @@ function getRotationByClick(event) {
     return rotation;
 }
 
+function manageKeyEventFromPlayer(event) {
+    let spellInvocation: SpellInvocation = null;
+    let spell: Spell = null;
+    switch (event.key.toLowerCase()) {
+        case gameSettings.player.bind.spell1:
+            spell = currentPlayer.spells.find((spell) => spell.action === SpellAction.spell1);
+            if (spell.type === SpellType.onGround) {
+                spellInvocation = new SpellInvocation(spell, convertToGameCoordinate(mouse, currentPlayer), currentPlayer);
+            } else {
+                spellInvocation = new SpellInvocation(spell, null, currentPlayer)
+            }
+            socket.emit("spell", spellInvocation);
+            break;
+        case gameSettings.player.bind.spell2:
+            spell = currentPlayer.spells.find((spell) => spell.action === SpellAction.spell2);
+            if (spell.type === SpellType.onGround) {
+                spellInvocation = new SpellInvocation(spell, convertToGameCoordinate(mouse, currentPlayer), currentPlayer);
+            } else {
+                spellInvocation = new SpellInvocation(spell, null, currentPlayer)
+            }
+            socket.emit("spell", spellInvocation);
+            break;
+        case gameSettings.player.bind.special:
+            let spellSpecial = null;
+            if (currentPlayer.special.type === SpellType.onGround) {
+                spellSpecial = new SpecialInvocation(currentPlayer.special, convertToGameCoordinate(mouse, currentPlayer), currentPlayer);
+            } else {
+                spellSpecial = new SpecialInvocation(currentPlayer.special, null, currentPlayer)
+            }
+            socket.emit("special", spellSpecial);
+            break;
+    }
+
+    if (spellInvocation) {
+        drawSpell(spellInvocation);
+    }
+}
+
+function drawSpell(spellInvocation: SpellInvocation) {
+    console.log(spellInvocation.spell.shape.name)
+    switch (spellInvocation.spell.shape.name) {
+        case "SemiCircleShape":
+            ctx.save();
+            ctx.beginPath();
+            ctx.fillStyle = "black";
+            if (spellInvocation.spell.type === SpellType.onGround) {
+                const coordinate = convertToCanvasCoordinate(spellInvocation.coordinate, currentPlayer);
+                ctx.translate(coordinate.x, coordinate.y);
+            } else {
+                const coordinate = convertToCanvasCoordinate(currentPlayer.coordinate, currentPlayer);
+                ctx.translate(coordinate.x, coordinate.y);
+            }
+            //rotate to the direction of the player
+            ctx.rotate(currentPlayer.rotation - Math.PI / 2);
+            ctx.arc(0, 0, (spellInvocation.spell.shape as SemiCircleShape).radius, 0, Math.PI);
+            ctx.fill();
+            ctx.closePath();
+            ctx.restore();
+            break;
+        case "CircleShape":
+            ctx.save();
+            ctx.beginPath();
+            ctx.fillStyle = "black";
+            if (spellInvocation.spell.type === SpellType.onGround) {
+                const coordinate = convertToCanvasCoordinate(spellInvocation.coordinate, currentPlayer);
+                ctx.translate(coordinate.x, coordinate.y);
+            } else {
+                const coordinate = convertToCanvasCoordinate(currentPlayer.coordinate, currentPlayer);
+                ctx.translate(coordinate.x, coordinate.y);
+            }
+            //rotate to the direction of the player
+            ctx.rotate(currentPlayer.rotation - Math.PI / 2);
+            ctx.arc(0, 0, (spellInvocation.spell.shape as CircleShape).radius, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.closePath();
+            ctx.restore();
+            break;
+        case "RectangleShape":
+            ctx.save();
+            ctx.beginPath();
+            ctx.fillStyle = "black";
+            if (spellInvocation.spell.type === SpellType.onGround) {
+                const coordinate = convertToCanvasCoordinate(spellInvocation.coordinate, currentPlayer);
+                ctx.translate(coordinate.x, coordinate.y);
+            } else {
+                const coordinate = convertToCanvasCoordinate(currentPlayer.coordinate, currentPlayer);
+                ctx.translate(coordinate.x, coordinate.y);
+            }
+            //rotate to the direction of the player
+            ctx.rotate(currentPlayer.rotation - Math.PI / 2);
+
+            const rectangleX = -(spellInvocation.spell.shape as RectangleShape).width / 2;
+
+            ctx.fillRect(rectangleX, 0, (spellInvocation.spell.shape as RectangleShape).width, (spellInvocation.spell.shape as RectangleShape).length);
+            ctx.fill();
+            ctx.closePath();
+            ctx.restore();
+            break;
+
+    }
+}
+
+
+function manageClickFromPlayer(event) {
+    const spell = currentPlayer.basicAttackSpell;
+    let spellInvocation: SpellInvocation = null;
+    if (currentPlayer.special.type === SpellType.onGround) {
+        spellInvocation = new SpellInvocation(spell, convertToGameCoordinate(mouse, currentPlayer), currentPlayer);
+    } else {
+        spellInvocation = new SpellInvocation(spell, null, currentPlayer);
+    }
+    socket.emit("spell", spellInvocation);
+
+    //Debug
+    if (spellInvocation) {
+        drawSpell(spellInvocation);
+    }
+
+}
+
 function init() {
     //SETUP
     canvas.width = window.document.documentElement.clientWidth;
@@ -346,6 +479,14 @@ function init() {
             },
             false
         );
+
+        document.addEventListener(
+            "keypress",
+            manageKeyEventFromPlayer);
+        
+        document.addEventListener(
+            "click",
+            manageClickFromPlayer);
     }
 
     //IO
