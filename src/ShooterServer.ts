@@ -56,6 +56,7 @@ export default class ShooterServer {
                     data.name.slice(0, 15)
                 );
 
+
                 socket.emit("welcome", {
                     worldDimension: this.game.worldDimension,
                     currentPlayer: currentPlayer,
@@ -79,9 +80,9 @@ export default class ShooterServer {
     _startGameLoop() {
         setInterval(() => {
             this.taskLoop.forEach((task) => task.call(this));
-            
+
             this.io.emit("update", {
-                players: this.game.players
+                players: this.game.players.map((p) => p.move(this.game)),
             });
         }, 1000 / this.tickrate);
     }

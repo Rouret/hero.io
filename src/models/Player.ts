@@ -1,34 +1,68 @@
 import Coordinate from "./utils/Coordinate";
 import Dimension from "./utils/Dimension";
 import Game from "./Game";
+import Spell from "./utils/Spell";
+import Special from "./utils/spells/Special";
 
-export default class Player {
-    id: string;
-    name: string;
-    coordinate: Coordinate;
-    speed: number;
-    initSpeed: number;
-    score: number;
-    size: number;
-    rotation: number;
-    clientDimension: Dimension;
+export default abstract class Player {
+    public id: string;
+    public name: string;
+    public speed: number;
+    public size: number;
+    public hp: number;
+    public basicAttackSpell: Spell;
+    public spells: Array<Spell> = [];
+    public special: Special;
 
-    constructor(id: string, window: Dimension, name: string, coordinate: Coordinate) {
+    public coordinate: Coordinate;
+    public initSpeed: number;
+    public score: number;
+    public rotation: number;
+    public clientDimension: Dimension;
+
+    protected constructor(
+        id: string,
+        name: string,
+        hp: number,
+        autoAttack: Spell,
+        spells: Array<Spell>,
+        special: Special,
+        coordinate: Coordinate,
+        speed: number,
+        size: number,
+        window: Dimension
+    ) {
         this.id = id;
         this.name = name;
+        this.hp = hp;
+        this.basicAttackSpell = autoAttack;
+        this.spells = spells;
+        this.special = special;
+
         this.coordinate = coordinate;
-        this.speed = 10;
+        this.speed = speed;
+        this.size = size;
+        this.clientDimension = window;
+
         this.initSpeed = this.speed;
         this.score = 0;
-        this.size = 50;
         this.rotation = 0;
-        this.clientDimension = new Dimension(window.width, window.height);
     }
 
-    move(game: Game) {
+    public abstract move(game: Game): Player;
+
+    public abstract basicAttack(players: Array<Player>): void;
+
+    public abstract firstSpell(players: Array<Player>): void;
+
+    public abstract secondSpell(players: Array<Player>): void;
+
+    public abstract specialSpell(players: Array<Player>): void;
+
+    protected _defaultMove(game: Game): void {
         const newPlayerCoordinate = new Coordinate(
-            this.coordinate.x + Math.cos(this.rotation) * this.speed,
-            this.coordinate.y - Math.sin(this.rotation) * this.speed
+            this.coordinate.x + this.speed * Math.cos(this.rotation),
+            this.coordinate.y + this.speed * Math.sin(this.rotation)
         );
 
         if (
@@ -42,5 +76,6 @@ export default class Player {
 
         this.coordinate = newPlayerCoordinate;
     }
+
 
 }

@@ -308,17 +308,17 @@ function getRotationByClick(event) {
         currentPlayer
     );
 
-    const vector = new Vector(
-        currentPlayer.coordinate.x,
-        currentPlayer.coordinate.y,
-        mouseWorldCoordinate.x,
-        mouseWorldCoordinate.y
+    const vector = Vector.factoryWithPoint(
+        currentPlayer.coordinate,
+        mouseWorldCoordinate
     );
 
-    let rotation = Math.acos(vector.x / vector.getMagnitude());
-    if (vector.y > 0) {
-        rotation = -rotation;
+    let rotation = vector.getAngle();
+
+    if (rotation < 0) {
+        rotation = 2 * Math.PI + rotation;
     }
+
 
     return rotation;
 }

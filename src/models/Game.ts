@@ -2,6 +2,7 @@ import Player from './Player';
 import {random} from '../utils';
 import Dimension from './utils/Dimension';
 import Coordinate from './utils/Coordinate';
+import Warrior from "./professions/Warrior";
 
 export default class Game {
     players: Player[];
@@ -14,7 +15,7 @@ export default class Game {
 
     addPlayer(id, window, name) {
         const playerCoordinate = new Coordinate(random(0, this.worldDimension.width), random(0, this.worldDimension.height))
-        const player = new Player(id, window, name, playerCoordinate);
+        const player = new Warrior(id, name, playerCoordinate, 50, window);
         this.players.push(player);
         return player;
     }
