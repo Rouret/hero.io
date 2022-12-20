@@ -5,9 +5,4 @@ export default class Coordinate {
     this.x = x;
     this.y = y;
   }
-
-  applyVector(vector) {
-    this.x += vector.x;
-    this.y += vector.y;
-  }
 }
