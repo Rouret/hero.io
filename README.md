@@ -89,11 +89,13 @@ npm run dev
     - [x] design des players, bullets
     - [x] design landing page
 - [x] V0.1.5<br>
-  Les balles et les boost sont désactivés pour se concentrer sur la carte le déplacement etc.
-    - [x] Descativer les boosts (temporairement)
-    - [x] Descativer les balles (temporairement)
+  **Les balles et les boost sont désactivés pour se concentrer sur la carte le déplacement etc.**
+    - [x] Descativer les boosts (_**temporairement**_)
+    - [x] Descativer les balles (**_temporairement_**)
     - [x] Système de caméra dynamique
     - [x] Base de la minimap
+    - [x] Affichage de la limite du terrain
+    - [x] Correction du bug de déplacement
 
 ## Idées pour la suite
 
