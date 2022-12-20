@@ -1,32 +1,32 @@
 {
-    "name": "shooter",
-    "version": "0.1.4",
-    "description": "shooter game",
-    "main": "out/server.js",
-    "scripts": {
-        "start": "node .",
-        "dev": "tsc && webpack --config ./webpack.config.js --mode development && ts-node src/bootstrap.ts",
-        "build": "tsc && webpack --config ./webpack.config.js --mode production",
-        "build-dev": "webpack --config ./webpack.config.js --mode development"
-    },
-    "author": "Lucas Rouret",
-    "license": "ISC",
-    "dependencies": {
-        "express": "^4.18.2",
-        "socket.io": "^4.5.3",
-        "socket.io-client": "^4.5.4"
-    },
-    "devDependencies": {
-        "@types/express": "^4.17.14",
-        "@types/socket.io": "^3.0.2",
-        "copy-webpack-plugin": "^11.0.0",
-        "@typescript-eslint/eslint-plugin": "^5.46.1",
-        "@typescript-eslint/parser": "^5.46.1",
-        "eslint": "^8.22.0",
-        "ts-loader": "^9.4.2",
-        "ts-node": "^10.9.1",
-        "typescript": "^4.9.3",
-        "webpack": "^5.75.0",
-        "webpack-cli": "^5.0.0"
-    }
+  "name": "shooter",
+  "version": "0.1.5",
+  "description": "shooter game",
+  "main": "out/server.js",
+  "scripts": {
+    "start": "node .",
+    "dev": "tsc && webpack --config ./webpack.config.js --mode development && ts-node src/bootstrap.ts",
+    "build": "tsc && webpack --config ./webpack.config.js --mode production",
+    "build-dev": "webpack --config ./webpack.config.js --mode development"
+  },
+  "author": "Lucas Rouret",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.5.3",
+    "socket.io-client": "^4.5.4"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.14",
+    "@types/socket.io": "^3.0.2",
+    "copy-webpack-plugin": "^11.0.0",
+    "@typescript-eslint/eslint-plugin": "^5.46.1",
+    "@typescript-eslint/parser": "^5.46.1",
+    "eslint": "^8.22.0",
+    "ts-loader": "^9.4.2",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.9.3",
+    "webpack": "^5.75.0",
+    "webpack-cli": "^5.0.0"
+  }
 }
