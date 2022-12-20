@@ -226,16 +226,16 @@ function drawMiniMap() {
     ctx.fillRect(gameSettings.minimap.miniMapSize - 1, 0, 1, gameSettings.minimap.miniMapSize);
     ctx.fillRect(0, gameSettings.minimap.miniMapSize - 1, gameSettings.minimap.miniMapSize, 1);
 
-    //Client scrren
-    ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
-    ctx.fillRect(
-        miniMapPlayerX - (canvas.width * gameSettings.minimap.miniMapRatio) / 2,
-        miniMapPlayerY - (canvas.height * gameSettings.minimap.miniMapRatio) / 2,
-        canvas.width * gameSettings.minimap.miniMapRatio,
-        canvas.height * gameSettings.minimap.miniMapRatio
-    );
+    if (gameSettings.cheat) {
+        ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+        ctx.fillRect(
+            miniMapPlayerX - (canvas.width * gameSettings.minimap.miniMapRatio) / 2,
+            miniMapPlayerY - (canvas.height * gameSettings.minimap.miniMapRatio) / 2,
+            canvas.width * gameSettings.minimap.miniMapRatio,
+            canvas.height * gameSettings.minimap.miniMapRatio
+        );
+    }
 
-    //CurrentPlayer
     ctx.fillStyle = "red";
     ctx.beginPath();
     ctx.arc(miniMapPlayerX, miniMapPlayerY, miniMapPlayerSize, 0, 2 * Math.PI);
@@ -370,7 +370,7 @@ function init() {
     //Calculate
     gameSettings.player.animation.playerRunImageFrameWidth = gameSettings.player.animation.playerRunImageWidth / gameSettings.player.animation.playerRunImageFrame
     gameSettings.timePerTick = 1000 / gameSettings.fps;
-    gameSettings.player.move.delay = Math.floor(gameSettings.fps / 2);
+    gameSettings.player.move.delay = Math.floor(gameSettings.fps / 10);
 
     if (gameSettings.players) {
         canvas.addEventListener(

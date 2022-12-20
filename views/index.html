@@ -5,175 +5,179 @@
     <meta charset='utf-8'>
     <meta content='IE=edge' http-equiv='X-UA-Compatible'>
     <title>Shooter</title>
-    <link href="assets/shooter_logo.png" rel="icon" type="image/png" />
+    <link href="assets/shooter_logo.png" rel="icon" type="image/png"/>
     <meta content='width=device-width, initial-scale=1' name='viewport'>
 </head>
 
 <body>
-    <style type="text/css">
-        @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@300;900&display=swap');
-        * {
-            padding: 0;
-            margin: 0;
+<style type="text/css">
+    @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@300;900&display=swap');
+
+    * {
+        padding: 0;
+        margin: 0;
+    }
+
+    canvas {
+        display: none;
+    }
+
+    .box {
+        background: #f2f2f2;
+        overflow: hidden;
+        border-radius: 20px;
+        box-shadow: 0 0 5px 5px #d0d0d0;
+        padding: 40px;
+        font-family: 'Merriweather', serif;
+        text-align: justify;
+        color: black;
+    }
+
+    input[type=text] {
+        width: 100%;
+        padding: 12px 20px;
+        margin: 8px 0;
+        display: inline-block;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+
+    button {
+        width: 100%;
+        background-color: rgb(229, 91, 17);
+        color: white;
+        padding: 14px 20px;
+        margin: 8px 0;
+        border: none;
+        border-radius: 4px;
+    }
+
+    #landing {
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        position: absolute;
+        background: linear-gradient(124deg, #d11919, #ffa500, #fef9c9, #9be292, #94c05b, #409072, #05a9ab, #004f99);
+        background-size: 1800% 1800%;
+        -webkit-animation: rainbow 40s ease infinite;
+        -z-animation: rainbow 40s ease infinite;
+        -o-animation: rainbow 40s ease infinite;
+        animation: rainbow 40s ease infinite;
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        flex-direction: row;
+    }
+
+    @-webkit-keyframes rainbow {
+        0% {
+            background-position: 0% 82%
         }
-        
-        canvas {
-            display: none;
+        50% {
+            background-position: 100% 19%
         }
-        
-        .box {
-            background: #f2f2f2;
-            overflow: hidden;
-            border-radius: 20px;
-            box-shadow: 0 0 5px 5px #d0d0d0;
-            padding: 40px;
-            font-family: 'Merriweather', serif;
-            text-align: justify;
-            color: black;
+        100% {
+            background-position: 0% 82%
         }
-        
-        input[type=text] {
-            width: 100%;
-            padding: 12px 20px;
-            margin: 8px 0;
-            display: inline-block;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
+    }
+
+    @-moz-keyframes rainbow {
+        0% {
+            background-position: 0% 82%
         }
-        
-        button {
-            width: 100%;
-            background-color: rgb(229, 91, 17);
-            color: white;
-            padding: 14px 20px;
-            margin: 8px 0;
-            border: none;
-            border-radius: 4px;
+        50% {
+            background-position: 100% 19%
         }
-        
-        #landing {
-            left: 0;
-            right: 0;
-            top: 0;
-            bottom: 0;
-            position: absolute;
-            background: linear-gradient(124deg, #d11919, #ffa500, #fef9c9, #9be292, #94c05b, #409072, #05a9ab, #004f99);
-            background-size: 1800% 1800%;
-            -webkit-animation: rainbow 40s ease infinite;
-            -z-animation: rainbow 40s ease infinite;
-            -o-animation: rainbow 40s ease infinite;
-            animation: rainbow 40s ease infinite;
-            width: 100vw;
-            height: 100vh;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            flex-direction: row;
+        100% {
+            background-position: 0% 82%
         }
-        
-        @-webkit-keyframes rainbow {
-            0% {
-                background-position: 0% 82%
-            }
-            50% {
-                background-position: 100% 19%
-            }
-            100% {
-                background-position: 0% 82%
-            }
+    }
+
+    @-o-keyframes rainbow {
+        0% {
+            background-position: 0% 82%
         }
-        
-        @-moz-keyframes rainbow {
-            0% {
-                background-position: 0% 82%
-            }
-            50% {
-                background-position: 100% 19%
-            }
-            100% {
-                background-position: 0% 82%
-            }
+        50% {
+            background-position: 100% 19%
         }
-        
-        @-o-keyframes rainbow {
-            0% {
-                background-position: 0% 82%
-            }
-            50% {
-                background-position: 100% 19%
-            }
-            100% {
-                background-position: 0% 82%
-            }
+        100% {
+            background-position: 0% 82%
         }
-        
-        @keyframes rainbow {
-            0% {
-                background-position: 0% 82%
-            }
-            50% {
-                background-position: 100% 19%
-            }
-            100% {
-                background-position: 0% 82%
-            }
+    }
+
+    @keyframes rainbow {
+        0% {
+            background-position: 0% 82%
         }
-        
-        #landing-content {
-            display: flex;
-            flex-direction: column;
+        50% {
+            background-position: 100% 19%
         }
-        
-        .mb-2 {
-            margin-bottom: 20px;
+        100% {
+            background-position: 0% 82%
         }
-        
-        .ml-2 {
-            margin-left: 20px;
-        }
-        
-        .center {
-            align-items: center;
-        }
-        
-        .row {
-            display: flex;
-            flex-direction: row;
-            justify-content: space-around;
-            align-items: center;
-        }
-    </style>
-    <canvas id="app"></canvas>
-    <div id="landing">
-        <div class="box" id="patch">
-            <h3>Patch 0.1.4</h3><br>
-            <ul>
-                <li>Fix bug de déplacement</li>
-                <li>Design joueur et bullet</li>
-                <li>Design landing page</li>
-            </ul>
-        </div>
-        <div class="box center" id="landing-content">
-            <img alt="logo" class="mb-2" height="160" src="assets/shooter_logo.png" width="160">
-            <h1>Shooter</h1>
-            <span class="mb-2">By <a href="https://github.com/rouret" target="_blank">Lucas Rouret</a></span>
-            <input autocomplete="off" id="name" placeholder="Pseudo ..." type="text">
-            <button id="start">Go tous les fumer</button>
-        </div>
-        <div class="box" id="settings">
-            <h3>Commandes</h3><br>
-            <ul>
-                <li>souris : Déplacement</li>
-                <li>click gauche ou espace : Tirer</li>
-            </ul>
-        </div>
+    }
+
+    #landing-content {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .mb-2 {
+        margin-bottom: 20px;
+    }
+
+    .ml-2 {
+        margin-left: 20px;
+    }
+
+    .center {
+        align-items: center;
+    }
+
+    .row {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-around;
+        align-items: center;
+    }
+</style>
+<canvas id="app"></canvas>
+<div id="landing">
+    <div class="box" id="patch">
+        <h3>Patch 0.1.5</h3><br>
+        <ul>
+            <li>Descativer les boosts (temporairement)</li>
+            <li>Descativer les balles (temporairement)</li>
+            <li>Système de caméra dynamique</li>
+            <li>Base de la minimap</li>
+            <li>Affichage de la limite du terrain</li>
+            <li>Correction du bug de déplacement</li>
+        </ul>
     </div>
-    <img id="player_run" src="assets/player_run.png" style="display: none;">
-    <img id="gun" src="assets/gun.png" style="display: none;">
-    <img id="bullet" src="assets/bullet.png" style="display: none;">
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="js/main.js"></script>
+    <div class="box center" id="landing-content">
+        <img alt="logo" class="mb-2" height="160" src="assets/shooter_logo.png" width="160">
+        <h1>Shooter</h1>
+        <span class="mb-2">By <a href="https://github.com/rouret" target="_blank">Lucas Rouret</a></span>
+        <input autocomplete="off" id="name" placeholder="Pseudo ..." type="text">
+        <button id="start">Go tous les fumer</button>
+    </div>
+    <div class="box" id="settings">
+        <h3>Commandes</h3><br>
+        <ul>
+            <li>souris : Déplacement</li>
+            <li>click gauche ou espace : Tirer</li>
+        </ul>
+    </div>
+</div>
+<img id="player_run" src="assets/player_run.png" style="display: none;">
+<img id="gun" src="assets/gun.png" style="display: none;">
+<img id="bullet" src="assets/bullet.png" style="display: none;">
+<script src="/socket.io/socket.io.js"></script>
+<script src="js/main.js"></script>
 </body>
 
 </html>

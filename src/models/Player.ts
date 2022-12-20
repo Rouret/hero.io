@@ -20,7 +20,7 @@ export default class Player {
         this.id = id;
         this.name = name;
         this.coordinate = coordinate;
-        this.speed = 5;
+        this.speed = 10;
         this.initSpeed = this.speed;
         this.score = 0;
         this.size = 50;
