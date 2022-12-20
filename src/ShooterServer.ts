@@ -125,24 +125,8 @@ export default class ShooterServer {
 
             socket.on("moving", (rotation) => {
                 if (currentPlayer === undefined) return;
-
-                currentPlayer.rotation = rotation;
-
-                const newPlayerCoordinate = new Coordinate(
-                    currentPlayer.coordinate.x + Math.cos(rotation) * currentPlayer.speed,
-                    currentPlayer.coordinate.y - Math.sin(rotation) * currentPlayer.speed
-                );
-
-                if (
-                    newPlayerCoordinate.x < 0 ||
-                    newPlayerCoordinate.x > this.game.worldDimension.width ||
-                    newPlayerCoordinate.y < 0 ||
-                    newPlayerCoordinate.y > this.game.worldDimension.height
-                ) {
-                    return;
-                }
-
-                currentPlayer.coordinate = newPlayerCoordinate;
+                currentPlayer.move(rotation, this.game);
+                currentPlayer.isMoving = true;
             });
 
             socket.on("shoot", (rotation: number) => {
@@ -176,11 +160,20 @@ export default class ShooterServer {
     _startGameLoop() {
         setInterval(() => {
             this.taskLoop.forEach((task) => task.call(this));
+
+            const playersToSend = this.game.players
+                .map((p) => {
+                    if (p.isMoving) return p;
+                    p.move(p.rotation, this.game);
+                    return p
+                })
+
             this.io.emit("update", {
-                players: this.game.players,
+                players: playersToSend,
                 bullets: this.game.bullets,
                 boosts: this.game.boosts,
             });
+            this.game.players.map((p) => p.isMoving = false);
         }, 1000 / this.tickrate);
     }
 

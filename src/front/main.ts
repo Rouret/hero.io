@@ -23,6 +23,7 @@ type GameState = {
 };
 let mouse = new Coordinate(0, 0);
 let frameIndex = 0;
+let moveIndex = 0;
 let username;
 let currentPlayer: Player;
 let worldDimension: Dimension;
@@ -59,7 +60,7 @@ const gameSettings = {
     fps: 60,
     timePerTick: 0, //calculated in init
     BACKGROUND_COLOR: "#fff",
-    cheat: true,
+    cheat: false,
     assets: {
         bulletImage: document.getElementById("bullet") as HTMLImageElement,
         gunImage: document.getElementById("gun") as HTMLImageElement
@@ -71,6 +72,9 @@ const gameSettings = {
             playerRunImageFrame: 7,
             playerRunImageFrameWidth: 0, //calculated in init
             playerRunImageFrameY: 0,
+        },
+        move: {
+            delay: 0//calculated in init
         }
     },
     minimap: {
@@ -100,8 +104,8 @@ function goLesFumer() {
 
 //Draw
 function drawPlayer(player: Player) {
-    const coefAceSpped = Math.floor(player.speed / player.initSpeed);
-    const ajustedFPS = Math.floor(gameSettings.fps / coefAceSpped);
+    const coefAceSpeed = Math.floor(player.speed / player.initSpeed);
+    const ajustedFPS = Math.floor(gameSettings.fps / coefAceSpeed);
     const ajustedFrameIndex = frameIndex % ajustedFPS;
 
     const playerRunImageFrameIndex = Math.floor(
@@ -374,12 +378,19 @@ function init() {
     //Calculate
     gameSettings.player.animation.playerRunImageFrameWidth = gameSettings.player.animation.playerRunImageWidth / gameSettings.player.animation.playerRunImageFrame
     gameSettings.timePerTick = 1000 / gameSettings.fps;
+    gameSettings.player.move.delay = Math.floor(gameSettings.fps / 2);
 
     if (gameSettings.players) {
         canvas.addEventListener(
             "mousemove",
             function (event) {
-                socket.emit("moving", getRotationByClick(event));
+                if (moveIndex >= gameSettings.player.move.delay) {
+                    socket.emit("moving", getRotationByClick(event));
+                    moveIndex = 0;
+                } else {
+                    moveIndex++;
+                }
+
             },
             false
         );
