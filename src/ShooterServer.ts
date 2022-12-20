@@ -3,8 +3,6 @@ import path from "path";
 import http from "http";
 import {Server, Socket} from "socket.io";
 import Game from "./models/Game";
-import {calcVector, getDistanceOfVector, random,} from "./utils";
-import Coordinate from "./models/Coordinate";
 import Player from "./models/Player";
 
 export default class ShooterServer {
@@ -16,9 +14,7 @@ export default class ShooterServer {
     publicFolder: string;
     viewsFolder: string;
     tickrate: number;
-    boostInterval: number;
     taskLoop: Array<() => void>;
-    _boostTimer: number;
 
     constructor() {
         this.app = express();
@@ -29,68 +25,15 @@ export default class ShooterServer {
         this.publicFolder = "../dist";
         this.viewsFolder = "../views";
         this.tickrate = 60;
-        this.boostInterval = this.tickrate;
-        this._boostTimer = 0;
-        this.taskLoop = [this._loopBullets, this._loopPlayers, this._loopBoosts];
-    }
-
-    _loopBullets() {
-        this.game.filterBullet();
-        if (this.game.players.length === 0) return;
-        this.game.bullets.forEach((bullet) => {
-            const vector = calcVector(
-                bullet.current.x,
-                bullet.current.y,
-                bullet.end.x,
-                bullet.end.y
-            );
-            const distance = getDistanceOfVector(vector);
-
-            const coef = distance / bullet.speed;
-            if (coef > 1) {
-                bullet.current.x += vector.x / coef;
-                bullet.current.y += vector.y / coef;
-            } else {
-                bullet.current.x = bullet.end.x;
-                bullet.current.y = bullet.end.y;
-                bullet.isAlive = false;
-            }
-        });
+        this.taskLoop = [this._loopPlayers];
     }
 
     _loopPlayers() {
-        this.game.players.forEach((player) => {
-            const bulletCollided = player.isCollidingWith(this.game.bullets);
-            if (bulletCollided !== null) {
-                const playerId = bulletCollided.player.id;
-
-                this.game.players.find((p) => p.id !== playerId).score++;
-
-                const playerCoordinate = new Coordinate(
-                    random(0, this.game.worldDimension.width),
-                    random(0, this.game.worldDimension.height)
-                );
-                player.coordinate = playerCoordinate;
-                player.removeEffect();
-            }
-            const boostCollided = player.isCollidingWithBoost(this.game.boosts);
-            if (boostCollided !== null) {
-                player.setEffect(boostCollided);
-                this.game.boosts = this.game.boosts.filter(
-                    (b) => b.id !== boostCollided.id
-                );
-            }
-        });
-    }
-
-    _loopBoosts() {
-        // Generate boosts
-        // this._boostTimer++;
-        // if (this._boostTimer >= this.boostInterval) {
-        //   const randomPos = randomPosOnScreen(this.game.players);
-        //   this.game.addBoost(randomPos);
-        //   this._boostTimer = 0;
-        // }
+        this.game.players = this.game.players
+            .map((p) => {
+                p.move(this.game)
+                return p;
+            })
     }
 
     _setupExpress() {
@@ -119,31 +62,9 @@ export default class ShooterServer {
                 });
             });
 
-            //send the players object to the new player
-            this.io.emit("update", {players: this.game.players});
-
             socket.on("moving", (rotation) => {
                 if (currentPlayer === undefined) return;
                 currentPlayer.rotation = rotation;
-            });
-
-            socket.on("shoot", (rotation: number) => {
-                if (currentPlayer === undefined) return;
-                const bulletCoordinate = new Coordinate(
-                    currentPlayer.coordinate.x + Math.cos(rotation),
-                    currentPlayer.coordinate.y - Math.sin(rotation)
-                );
-
-                if (
-                    bulletCoordinate.x < 0 ||
-                    bulletCoordinate.x > this.game.worldDimension.width ||
-                    bulletCoordinate.y < 0 ||
-                    bulletCoordinate.y > this.game.worldDimension.height
-                ) {
-                    return;
-                }
-
-                this.game.addBullet(currentPlayer.coordinate, bulletCoordinate, currentPlayer);
             });
 
             socket.on("disconnect", () => {
@@ -158,17 +79,9 @@ export default class ShooterServer {
     _startGameLoop() {
         setInterval(() => {
             this.taskLoop.forEach((task) => task.call(this));
-
-            const playersToSend = this.game.players
-                .map((p) => {
-                    p.move(this.game)
-                    return p;
-                })
-
+            
             this.io.emit("update", {
-                players: playersToSend,
-                bullets: this.game.bullets,
-                boosts: this.game.boosts,
+                players: this.game.players
             });
         }, 1000 / this.tickrate);
     }

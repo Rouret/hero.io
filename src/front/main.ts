@@ -1,10 +1,8 @@
 import io from "socket.io-client";
-import Bullet from "../models/Bullet";
-import Boost from "../models/Boost";
 import Player from "../models/Player";
-import Dimension from "../models/Dimension";
-import Coordinate from "../models/Coordinate";
-import {calcVector, getDistanceOfVector} from "../utils";
+import Dimension from "../models/utils/Dimension";
+import Coordinate from "../models/utils/Coordinate";
+import Vector from "../models/utils/Vector";
 
 const socket = io();
 
@@ -17,9 +15,7 @@ const ctx: CanvasRenderingContext2D = canvas.getContext("2d");
 //GAME SETUP
 type GameState = {
     needToDraw: boolean;
-    players: Player[];
-    bullets: Bullet[];
-    boosts: Boost[];
+    players: Player[]
 };
 let mouse = new Coordinate(0, 0);
 let frameIndex = 0;
@@ -35,9 +31,6 @@ const elName: HTMLInputElement = document.getElementById(
 const elLanding: HTMLDivElement = document.getElementById(
     "landing"
 ) as HTMLDivElement;
-const playerRunImage = document.getElementById(
-    "player_run"
-) as HTMLImageElement;
 const elButton: HTMLButtonElement = document.getElementById(
     "start"
 ) as HTMLButtonElement;
@@ -45,25 +38,20 @@ const elButton: HTMLButtonElement = document.getElementById(
 //from the server
 let gameState: GameState = {
     needToDraw: false,
-    players: [],
-    bullets: [],
-    boosts: [],
+    players: []
 };
 //local mouse position
 const gameSettings = {
     showMiniMap: true,
     showLeaderboard: false,
-    bullets: false,
     players: true,
-    boosts: false,
     limitWall: 20,
     fps: 60,
     timePerTick: 0, //calculated in init
-    BACKGROUND_COLOR: "#fff",
+    backgroundColor: "#fff",
     cheat: true,
     assets: {
-        bulletImage: document.getElementById("bullet") as HTMLImageElement,
-        gunImage: document.getElementById("gun") as HTMLImageElement
+        player: document.getElementById("player_run") as HTMLImageElement
     },
     player: {
         animation: {
@@ -121,7 +109,7 @@ function drawPlayer(player: Player) {
         ctx.scale(-1, 1);
     }
     ctx.drawImage(
-        playerRunImage,
+        gameSettings.assets.player,
         playerRunImageFrameX,
         gameSettings.player.animation.playerRunImageFrameY,
         gameSettings.player.animation.playerRunImageFrameWidth,
@@ -131,13 +119,6 @@ function drawPlayer(player: Player) {
         player.size,
         player.size
     );
-    ctx.restore();
-
-    //draw gun
-    ctx.save();
-    ctx.translate(player.coordinate.x, player.coordinate.y);
-    ctx.rotate(player.rotation);
-    ctx.drawImage(gameSettings.assets.gunImage, -player.size / 2, -player.size / 2, 40, 20);
 
     //draw a red cirlce around the player
     if (gameSettings.cheat) {
@@ -166,8 +147,6 @@ function drawPlayer(player: Player) {
         ctx.strokeStyle = "red";
         ctx.stroke();
     }
-
-
     ctx.restore();
 
     if (gameSettings.cheat) {
@@ -185,43 +164,6 @@ function drawPlayer(player: Player) {
         player.coordinate.x - player.name.length * 5,
         player.coordinate.y - player.size / 2 - 10
     );
-}
-
-function drawBullet(bullet: Bullet) {
-    console.log(bullet);
-    const currentCoordinateCanvas = convertToCanvasCoordinate(
-        bullet.current,
-        currentPlayer
-    );
-
-    const endCoordinateCanvas = convertToCanvasCoordinate(
-        bullet.end,
-        currentPlayer
-    );
-    ctx.save();
-    ctx.translate(currentCoordinateCanvas.x, currentCoordinateCanvas.y);
-    ctx.drawImage(gameSettings.assets.bulletImage, 0, 0, bullet.size, bullet.size);
-    ctx.restore();
-
-    //draw a line from the player to the bullet
-    if (gameSettings.cheat) {
-        ctx.beginPath();
-        ctx.moveTo(currentCoordinateCanvas.x, currentCoordinateCanvas.y);
-        ctx.lineTo(endCoordinateCanvas.x, endCoordinateCanvas.y);
-        ctx.strokeStyle = "red";
-        ctx.stroke();
-    }
-}
-
-function drawBoost(boost: Boost) {
-    ctx.fillStyle = boost.color;
-    const saveFillStyle = ctx.fillStyle;
-    ctx.beginPath();
-    ctx.fillStyle = boost.color;
-    ctx.arc(boost.x, boost.y, boost.size, 0, 2 * Math.PI);
-    ctx.closePath();
-    ctx.fill();
-    ctx.fillStyle = saveFillStyle;
 }
 
 function drawLeaderboard() {
@@ -314,22 +256,12 @@ function draw() {
         // clear canvas
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         // draw background
-        ctx.fillStyle = gameSettings.BACKGROUND_COLOR;
+        ctx.fillStyle = gameSettings.backgroundColor;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         // draw players
         if (gameSettings.players) {
             gameState.players.forEach(drawPlayer);
-        }
-
-        //draw bullets
-        if (gameSettings.bullets) {
-            gameState.bullets.forEach(drawBullet);
-        }
-
-        //draw boosts if gameSettings.boosts is true
-        if (gameSettings.boosts) {
-            gameState.boosts.forEach(drawBoost);
         }
 
         drawMap();
@@ -376,14 +308,14 @@ function getRotationByClick(event) {
         currentPlayer
     );
 
-    const vector = calcVector(
+    const vector = new Vector(
         currentPlayer.coordinate.x,
         currentPlayer.coordinate.y,
         mouseWorldCoordinate.x,
         mouseWorldCoordinate.y
     );
 
-    let rotation = Math.acos(vector.x / getDistanceOfVector(vector));
+    let rotation = Math.acos(vector.x / vector.getMagnitude());
     if (vector.y > 0) {
         rotation = -rotation;
     }
@@ -411,23 +343,6 @@ function init() {
                     moveIndex++;
                 }
 
-            },
-            false
-        );
-    }
-
-    //Shoot Event
-    if (gameSettings.bullets) {
-        document.addEventListener("keyup", (event) => {
-            if (event.key === " ") {
-                socket.emit("shoot", {x: mouse.x, y: mouse.y});
-            }
-        });
-
-        canvas.addEventListener(
-            "click",
-            function (event) {
-                socket.emit("shoot", getRotationByClick(event));
             },
             false
         );
@@ -462,14 +377,6 @@ function init() {
                 );
 
                 return player;
-            });
-        }
-
-        if (gameSettings.bullets) {
-            gameState.bullets.map((bullet) => {
-                bullet.current = convertToCanvasCoordinate(bullet.current, currentPlayer);
-                bullet.end = convertToCanvasCoordinate(bullet.end, currentPlayer); //only for cheat
-                return bullet;
             });
         }
 
