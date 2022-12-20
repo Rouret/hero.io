@@ -60,7 +60,7 @@ const gameSettings = {
     fps: 60,
     timePerTick: 0, //calculated in init
     BACKGROUND_COLOR: "#fff",
-    cheat: false,
+    cheat: true,
     assets: {
         bulletImage: document.getElementById("bullet") as HTMLImageElement,
         gunImage: document.getElementById("gun") as HTMLImageElement
@@ -139,9 +139,37 @@ function drawPlayer(player: Player) {
     ctx.rotate(player.rotation);
     ctx.drawImage(gameSettings.assets.gunImage, -player.size / 2, -player.size / 2, 40, 20);
 
+    //draw a red cirlce around the player
+    if (gameSettings.cheat) {
+        ctx.beginPath();
+        ctx.arc(0, 0, 50, 0, 2 * Math.PI);
+        ctx.strokeStyle = "green";
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(0, 0, 100, 0, 2 * Math.PI);
+        ctx.strokeStyle = "blue";
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(0, 0, 150, 0, 2 * Math.PI);
+        ctx.strokeStyle = "yellow";
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(0, 0, 200, 0, 2 * Math.PI);
+        ctx.strokeStyle = "orange";
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(0, 0, 250, 0, 2 * Math.PI);
+        ctx.strokeStyle = "red";
+        ctx.stroke();
+    }
+
+
     ctx.restore();
 
-    //draw line between player and mouse
     if (gameSettings.cheat) {
         ctx.beginPath();
         ctx.moveTo(player.coordinate.x, player.coordinate.y);

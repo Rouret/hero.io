@@ -124,8 +124,7 @@ export default class ShooterServer {
 
             socket.on("moving", (rotation) => {
                 if (currentPlayer === undefined) return;
-                currentPlayer.move(rotation, this.game);
-                currentPlayer.isMoving = true;
+                currentPlayer.rotation = rotation;
             });
 
             socket.on("shoot", (rotation: number) => {
@@ -162,9 +161,8 @@ export default class ShooterServer {
 
             const playersToSend = this.game.players
                 .map((p) => {
-                    if (p.isMoving) return p;
-                    p.move(p.rotation, this.game);
-                    return p
+                    p.move(this.game)
+                    return p;
                 })
 
             this.io.emit("update", {
@@ -172,7 +170,6 @@ export default class ShooterServer {
                 bullets: this.game.bullets,
                 boosts: this.game.boosts,
             });
-            this.game.players.map((p) => p.isMoving = false);
         }, 1000 / this.tickrate);
     }
 

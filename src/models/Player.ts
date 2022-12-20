@@ -14,7 +14,6 @@ export default class Player {
     rotation: number;
     clientDim: Dimension;
     effect: any;
-    isMoving: boolean;
 
     constructor(id: string, window: Dimension, name: string, coordinate: Coordinate) {
         this.id = id;
@@ -28,7 +27,6 @@ export default class Player {
 
         this.clientDim = new Dimension(window.width, window.height);
         this.effect = null;
-        this.isMoving = false;
     }
 
     isCollidingWith(bullets) {
@@ -61,12 +59,10 @@ export default class Player {
         return null;
     }
 
-    move(rotation: number, game: Game) {
-        this.rotation = rotation;
-
+    move(game: Game) {
         const newPlayerCoordinate = new Coordinate(
-            this.coordinate.x + Math.cos(rotation) * this.speed,
-            this.coordinate.y - Math.sin(rotation) * this.speed
+            this.coordinate.x + Math.cos(this.rotation) * this.speed,
+            this.coordinate.y - Math.sin(this.rotation) * this.speed
         );
 
         if (

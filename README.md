@@ -38,7 +38,7 @@
 
 <!-- ABOUT THE PROJECT -->
 
-## Le projet
+# Le projet
 
 Le jeu shooter est un jeu de tir, dans lequel le joueur contrôle un personnage qui peut tirer sur d'autres joueurs. Le
 but du jeu est de tuer le plus de joueurs possible.
@@ -47,7 +47,7 @@ Shooter fonctionne sur n'importe quel navigateur, il suffit de se connecter à l
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-### Construit avec
+## Construit avec
 
 * [Node.js](https://nodejs.org/en/)
 * [Express](https://expressjs.com/)
@@ -55,7 +55,7 @@ Shooter fonctionne sur n'importe quel navigateur, il suffit de se connecter à l
 * [TypeScript](https://www.typescriptlang.org/)
 * [Webpack](https://webpack.js.org/)
 
-### Installation
+## Installation
 
 Pour build
 
@@ -96,15 +96,12 @@ npm run dev
     - [x] Base de la minimap
     - [x] Affichage de la limite du terrain
     - [x] Correction du bug de déplacement
+- [ ] V0.1.6<br>
+    - [ ] Mise en place de la première classe
 
-## Idées pour la suite
+### Effets et classes
 
-- Une map plus grande avec des obstacle
-- Système de caméra dynamique (V0.1.5)
-- Système d'arme
-- Vie / Shield
-- Spawn de joueur
-- Spawn d'arme
+- [Effets et Classes](./doc/CLASSES.md)
 
 <!-- CONTRIBUTING -->
 
