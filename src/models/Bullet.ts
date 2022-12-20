@@ -2,7 +2,7 @@ import Player from "./Player";
 import Coordinate from "./Coordinate";
 
 export default class Bullet {
-    static ttl: number = 100;
+    static ttl = 100;
     current: Coordinate;
     player: Player;
     end: Coordinate;

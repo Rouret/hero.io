@@ -6,7 +6,6 @@ import Game from "./models/Game";
 import {calcVector, getDistanceOfVector, random,} from "./utils";
 import Coordinate from "./models/Coordinate";
 import Player from "./models/Player";
-import Bullet from "./models/Bullet";
 
 export default class ShooterServer {
     app: express.Application;
@@ -132,8 +131,8 @@ export default class ShooterServer {
             socket.on("shoot", (rotation: number) => {
                 if (currentPlayer === undefined) return;
                 const bulletCoordinate = new Coordinate(
-                    currentPlayer.coordinate.x + Math.cos(rotation) * Bullet.ttl,
-                    currentPlayer.coordinate.y - Math.sin(rotation) * Bullet.ttl
+                    currentPlayer.coordinate.x + Math.cos(rotation),
+                    currentPlayer.coordinate.y - Math.sin(rotation)
                 );
 
                 if (

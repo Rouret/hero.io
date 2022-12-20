@@ -250,16 +250,8 @@ function drawMap() {
         currentPlayer.coordinate.x - canvas.width / 2,
         currentPlayer.coordinate.y - canvas.height / 2
     );
-    const topRight = new Coordinate(
-        currentPlayer.coordinate.x + canvas.width / 2,
-        currentPlayer.coordinate.y - canvas.height / 2
-    );
     const bottomRight = new Coordinate(
         currentPlayer.coordinate.x + canvas.width / 2,
-        currentPlayer.coordinate.y + canvas.height / 2
-    );
-    const bottomLeft = new Coordinate(
-        currentPlayer.coordinate.x - canvas.width / 2,
         currentPlayer.coordinate.y + canvas.height / 2
     );
 
