@@ -107,6 +107,7 @@ npm run dev
 
 ## Contributeurs
 
+* [Thibault](https://github.com/joysecc)
 * [Tanguy](https://github.com/tanguymossion)
 * [Nicolas](https://github.com/nkirchhoffer)
 

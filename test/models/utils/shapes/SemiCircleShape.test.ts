@@ -7,7 +7,7 @@ describe("SemiCircleShape", () => {
 
     it("is in", () => {
         const playerCoordinate = new Coordinate(0, 0);
-        const objectCoordinate = new Coordinate(1, 1);
+        const objectCoordinate = new Coordinate(0.5, 0.5);
         const isInside = new SemiCircleShape(magnitude).isInside(objectCoordinate, playerCoordinate, playerAngle);
 
         expect(isInside).toBeTruthy();

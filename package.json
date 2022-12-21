@@ -7,7 +7,8 @@
     "start": "node .",
     "dev": "tsc && webpack --config ./webpack.config.js --mode development && ts-node src/bootstrap.ts",
     "build": "tsc && webpack --config ./webpack.config.js --mode production",
-    "build-dev": "webpack --config ./webpack.config.js --mode development"
+    "build-dev": "webpack --config ./webpack.config.js --mode development",
+    "test": "jest"
   },
   "author": "Lucas Rouret",
   "license": "ISC",
