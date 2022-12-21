@@ -8,7 +8,7 @@ import SpellInvocation from "./models/utils/spells/SpellInvocation";
 import SpecialInvocation from "./models/utils/specials/SpecialInvocation";
 import Dimension from "./models/utils/Dimension";
 
-export default class ShooterServer {
+export default class HeroServer {
     app: express.Application;
     server: http.Server;
     io: Server;

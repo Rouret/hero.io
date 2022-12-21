@@ -1,5 +1,5 @@
-import ShooterServer from "./ShooterServer";
+import HeroServer from "./HeroServer";
 
-const server = new ShooterServer();
+const server = new HeroServer();
 server.start()
 
