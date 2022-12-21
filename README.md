@@ -4,13 +4,13 @@
 <br />
 <div align="center">
   <a href="https://github.com/othneildrew/Best-README-Template">
-    <img src="assets/shooter_logo.png" alt="Logo" width="80" height="80">
+    <img src="assets/logo.png" alt="Logo" width="80" height="80">
   </a>
 
-<h3 align="center">Shooter</h3>
+<h3 align="center">Hero.io</h3>
 
   <p align="center">
-    Shooter game
+    Hero.io
   </p>
 </div>
 
@@ -40,10 +40,10 @@
 
 # Le projet
 
-Le jeu shooter est un jeu de tir, dans lequel le joueur contrôle un personnage qui peut tirer sur d'autres joueurs. Le
-but du jeu est de tuer le plus de joueurs possible.
+Le jeu hero.io est un jeu en réseau sur navigateur, où vous incarnez un héro qui doit tuer le plus d'adversaires
+possible.
 
-Shooter fonctionne sur n'importe quel navigateur, il suffit de se connecter à l'adresse du serveur.
+Hero.io fonctionne sur n'importe quel navigateur, il suffit de se connecter à l'adresse du serveur.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

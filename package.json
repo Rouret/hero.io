@@ -1,7 +1,7 @@
 {
-  "name": "shooter",
+  "name": "hero.io",
   "version": "0.1.5",
-  "description": "shooter game",
+  "description": "hero.io",
   "main": "out/server.js",
   "scripts": {
     "start": "node .",

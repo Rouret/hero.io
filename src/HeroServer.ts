@@ -7,7 +7,7 @@ import {calcVector, getDistanceOfVector, random,} from "./utils";
 import Coordinate from "./models/Coordinate";
 import Player from "./models/Player";
 
-export default class ShooterServer {
+export default class HeroServer {
     app: express.Application;
     server: http.Server;
     io: Server;
