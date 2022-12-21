@@ -8,7 +8,8 @@
     "dev": "tsc && webpack --config ./webpack.config.js --mode development && ts-node src/bootstrap.ts",
     "build": "tsc && webpack --config ./webpack.config.js --mode production",
     "build-dev": "webpack --config ./webpack.config.js --mode development",
-    "test": "jest"
+    "test": "jest",
+    "lint": "eslint src"
   },
   "author": "Lucas Rouret",
   "license": "ISC",

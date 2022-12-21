@@ -219,10 +219,25 @@ function drawMiniMap() {
         );
     }
 
-    ctx.fillStyle = "red";
+    ctx.fillStyle = "green";
     ctx.beginPath();
     ctx.arc(miniMapPlayerX, miniMapPlayerY, miniMapPlayerSize, 0, 2 * Math.PI);
     ctx.closePath();
+
+    if (gameSettings.cheat) {
+        gameState.players.filter(player => player.id !== currentPlayer.id)
+            .forEach(player => {
+                const miniMapPlayerSize = player.size * gameSettings.minimap.miniMapRatio;
+                const miniMapPlayerX = player.coordinate.x * gameSettings.minimap.miniMapRatio;
+                const miniMapPlayerY = player.coordinate.y * gameSettings.minimap.miniMapRatio;
+
+                ctx.fillStyle = "red";
+                ctx.beginPath();
+                ctx.arc(miniMapPlayerX, miniMapPlayerY, miniMapPlayerSize, 0, 2 * Math.PI);
+                ctx.closePath();
+                ctx.fill();
+            })
+    }
 
     ctx.fill();
     ctx.restore();
@@ -439,8 +454,8 @@ function drawSpell(spellInvocation: SpellInvocation) {
 }
 
 
-function manageClickFromPlayer(event) {
-    const spell = currentPlayer.basicAttackSpell;
+function manageClickFromPlayer(event: MouseEvent) {
+    const spell: Spell = currentPlayer.basicAttackSpell;
     let spellInvocation: SpellInvocation = null;
     if (currentPlayer.special.type === SpellType.onGround) {
         spellInvocation = new SpellInvocation(spell, convertToGameCoordinate(mouse, currentPlayer), currentPlayer);
@@ -453,7 +468,6 @@ function manageClickFromPlayer(event) {
     if (spellInvocation) {
         drawSpell(spellInvocation);
     }
-
 }
 
 function init() {
@@ -483,7 +497,7 @@ function init() {
         document.addEventListener(
             "keypress",
             manageKeyEventFromPlayer);
-        
+
         document.addEventListener(
             "click",
             manageClickFromPlayer);

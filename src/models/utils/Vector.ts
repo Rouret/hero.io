@@ -1,8 +1,8 @@
 import Coordinate from "./Coordinate";
 
 export default class Vector {
-    x: number = 0;
-    y: number = 0;
+    x = 0;
+    y = 0;
 
     protected constructor(ax: number, ay: number, bx: number, by: number) {
         this.x = bx - ax;

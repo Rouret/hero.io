@@ -4,10 +4,10 @@ import Dimension from "../utils/Dimension";
 import Game from "../Game";
 import Spell from "../utils/spells/Spell";
 import SemiCircleShape from "../utils/shapes/SemiCircleShape";
-import PushBackEffect from "../utils/effects/PushBackEffect";
+import {PushBackEffect, PushBackType} from "../utils/effects/PushBackEffect";
 import CircleShape from "../utils/shapes/CircleShape";
 import RectangleShape from "../utils/shapes/RectangleShape";
-import HealEffect from "../utils/effects/HealEffect";
+import {HealEffect, HealType} from "../utils/effects/HealEffect";
 import BlockEffect from "../utils/effects/BlockEffect";
 import Dash from "../utils/specials/Dash";
 import {SpellType} from "../utils/spells/SpellType";
@@ -24,6 +24,10 @@ export default class Warrior extends Player {
         size: number,
         window: Dimension
     ) {
+        super(id, name, Warrior.hp, coordinate, Warrior.speed, size, window);
+    }
+
+    registerSpellAndSpecial(): void {
         const basicAttackSpell = new Spell(
             "Sword strike",
             "PushBack the enemies in front of you",
@@ -31,9 +35,10 @@ export default class Warrior extends Player {
             1.25,
             10,
             new SemiCircleShape(50),
-            new PushBackEffect(),
+            new PushBackEffect(PushBackType.pushBack1),
             SpellType.onCharacter,
-            SpellAction.basicAttack
+            SpellAction.basicAttack,
+            this
         );
 
         const firstSpell = new Spell(
@@ -43,9 +48,10 @@ export default class Warrior extends Player {
             4,
             40,
             new CircleShape(50),
-            new PushBackEffect(),
+            new PushBackEffect(PushBackType.pushBack1),
             SpellType.onCharacter,
-            SpellAction.spell1
+            SpellAction.spell1,
+            this
         );
 
         const secondSpell = new Spell(
@@ -55,9 +61,10 @@ export default class Warrior extends Player {
             2.5,
             15,
             new RectangleShape(125, 25),
-            new HealEffect(),
+            new HealEffect(HealType.sustain, null),
             SpellType.onCharacter,
-            SpellAction.spell2
+            SpellAction.spell2,
+            this
         );
 
         const spells = [firstSpell, secondSpell];
@@ -72,8 +79,9 @@ export default class Warrior extends Player {
             SpellAction.special
         );
 
-
-        super(id, name, Warrior.hp, basicAttackSpell, spells, special, coordinate, Warrior.speed, size, window);
+        this.basicAttackSpell = basicAttackSpell;
+        this.spells = spells;
+        this.special = special;
     }
 
     basicAttack(players: Array<Player>): void {

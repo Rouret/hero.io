@@ -16,6 +16,7 @@ export default class Game {
     addPlayer(id, window, name) {
         const playerCoordinate = new Coordinate(random(0, this.worldDimension.width), random(0, this.worldDimension.height))
         const player = new Warrior(id, name, playerCoordinate, 50, window);
+        player.registerSpellAndSpecial();
         this.players.push(player);
         return player;
     }
