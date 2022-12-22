@@ -41,6 +41,9 @@ const playerRunImage = document.getElementById(
 const elButton: HTMLButtonElement = document.getElementById(
     "start"
 ) as HTMLButtonElement;
+const elSettingsButton: HTMLButtonElement = document.getElementById(
+    "settingsSave"
+) as HTMLButtonElement;
 
 //from the server
 let gameState: GameState = {
@@ -75,6 +78,11 @@ const gameSettings = {
         },
         move: {
             delay: 0//calculated in init
+        },
+        bind: {
+            spell1: "a",
+            spell2: "z",
+            special: "c",
         }
     },
     minimap: {
@@ -90,6 +98,44 @@ elName.addEventListener("keyup", ({key}) => {
         goLesFumer();
     }
 });
+
+elSettingsButton.addEventListener("click", settingSwitch);
+
+function settingSwitch() {
+    let settingsConfig = document.getElementsByClassName(
+        'settingsConfig',
+      ) as HTMLCollectionOf<HTMLElement>;
+    let modifyingState = true;
+    let alreadySetkeys = [];
+
+    if (settingsConfig.length === 0) {
+        settingsConfig = document.getElementsByClassName(
+            'settingsConfigText',
+            ) as HTMLCollectionOf<HTMLElement>;
+        modifyingState = false;
+    }
+    const elementType = !modifyingState ? "input" : "p";
+    const elementClass = !modifyingState ? "settingsConfig" : "settingsConfigText";
+    const arrSettings = Array.from(settingsConfig);
+
+    arrSettings.forEach(settingConfigOld => {
+        const parent = settingConfigOld.parentElement;
+        const settingConfigNew = document.createElement(elementType);
+        settingConfigNew.innerText = (<HTMLInputElement>settingConfigOld).value;
+        settingConfigNew.classList.add(elementClass);
+        settingConfigNew.setAttribute("id", settingConfigOld.id);
+        if(!modifyingState){
+            settingConfigNew.setAttribute("value", settingConfigOld.innerText);
+            settingConfigNew.setAttribute("size", "1");
+            settingConfigNew.setAttribute("maxlength", "1");
+        }
+        else if (settingConfigNew.innerText == "" || settingConfigNew.innerText == " " || alreadySetkeys.includes(settingConfigNew.innerText)){
+            settingConfigNew.innerText = gameSettings.player.bind[settingConfigNew.id];
+        }
+        alreadySetkeys.push(settingConfigNew.innerText);
+        parent.replaceChild(settingConfigNew, settingConfigOld);
+    });
+}
 
 function goLesFumer() {
     username = elName.value;
