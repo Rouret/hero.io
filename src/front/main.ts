@@ -41,8 +41,17 @@ const playerRunImage = document.getElementById(
 const elButton: HTMLButtonElement = document.getElementById(
     "start"
 ) as HTMLButtonElement;
-const elSettingsButton: HTMLButtonElement = document.getElementById(
-    "settingsSave"
+const elBasicAttackButton: HTMLButtonElement = document.getElementById(
+    "basicAttack"
+) as HTMLButtonElement;
+const elSpell1Button: HTMLButtonElement = document.getElementById(
+    "spell1"
+) as HTMLButtonElement;
+const elSpell2Button: HTMLButtonElement = document.getElementById(
+    "spell2"
+) as HTMLButtonElement;
+const elSpecialButton: HTMLButtonElement = document.getElementById(
+    "special"
 ) as HTMLButtonElement;
 
 //from the server
@@ -92,49 +101,97 @@ const gameSettings = {
 }
 
 //Listeners landing page
-elButton.addEventListener("click", goLesFumer);
 elName.addEventListener("keyup", ({key}) => {
     if (key === "Enter") {
         goLesFumer();
     }
 });
+setSettinglistener(true);
 
-elSettingsButton.addEventListener("click", settingSwitch);
 
-function settingSwitch() {
-    let settingsConfig = document.getElementsByClassName(
-        'settingsConfig',
-      ) as HTMLCollectionOf<HTMLElement>;
-    let modifyingState = true;
-    let alreadySetkeys = [];
-
-    if (settingsConfig.length === 0) {
-        settingsConfig = document.getElementsByClassName(
-            'settingsConfigText',
-            ) as HTMLCollectionOf<HTMLElement>;
-        modifyingState = false;
+function setSettinglistener(modifyingState: boolean) {
+    if (modifyingState) {
+        elBasicAttackButton.addEventListener("click", settingSwitch);
+        elSpell1Button.addEventListener("click", settingSwitch);
+        elSpell2Button.addEventListener("click", settingSwitch);
+        elSpecialButton.addEventListener("click", settingSwitch);
+        elButton.addEventListener("click", goLesFumer);
+    } else {
+        elBasicAttackButton.removeEventListener("click", settingSwitch);
+        elSpell1Button.removeEventListener("click", settingSwitch);
+        elSpell2Button.removeEventListener("click", settingSwitch);
+        elSpecialButton.removeEventListener("click", settingSwitch);
+        elButton.removeEventListener("click", goLesFumer);
     }
-    const elementType = !modifyingState ? "input" : "p";
-    const elementClass = !modifyingState ? "settingsConfig" : "settingsConfigText";
-    const arrSettings = Array.from(settingsConfig);
+}
 
-    arrSettings.forEach(settingConfigOld => {
-        const parent = settingConfigOld.parentElement;
-        const settingConfigNew = document.createElement(elementType);
-        settingConfigNew.innerText = (<HTMLInputElement>settingConfigOld).value;
-        settingConfigNew.classList.add(elementClass);
-        settingConfigNew.setAttribute("id", settingConfigOld.id);
-        if(!modifyingState){
-            settingConfigNew.setAttribute("value", settingConfigOld.innerText);
-            settingConfigNew.setAttribute("size", "1");
-            settingConfigNew.setAttribute("maxlength", "1");
+function settingSwitch(event) {
+    setSettinglistener(false);
+    let bind = event.target.id;
+    event.target.innerText = "Press a key";
+    function settingListener(event) {
+        changeBind(event, bind, settingListener);
+    }
+    document.addEventListener("keypress", settingListener);
+    //remove event listener if escape is pressed
+    document.addEventListener("keydown", event => {
+        if (event.key === "Escape") {
+            setSettinglistener(true);
+            const button = document.getElementById(bind);
+            button.innerText = gameSettings.player.bind[bind].toString();
+            document.removeEventListener("keypress", settingListener);
         }
-        else if (settingConfigNew.innerText == "" || settingConfigNew.innerText == " " || alreadySetkeys.includes(settingConfigNew.innerText)){
-            settingConfigNew.innerText = gameSettings.player.bind[settingConfigNew.id];
-        }
-        alreadySetkeys.push(settingConfigNew.innerText);
-        parent.replaceChild(settingConfigNew, settingConfigOld);
     });
+    //document.addEventListener("click", settingListener);
+    // let settingsConfig = document.getElementsByClassName(
+    //     'settingsConfig',
+    //   ) as HTMLCollectionOf<HTMLElement>;
+    // let modifyingState = true;
+    // let alreadySetkeys = [];
+
+    // if (settingsConfig.length === 0) {
+    //     settingsConfig = document.getElementsByClassName(
+    //         'settingsConfigText',
+    //         ) as HTMLCollectionOf<HTMLElement>;
+    //     modifyingState = false;
+    // }
+    // const elementType = !modifyingState ? "input" : "p";
+    // const elementClass = !modifyingState ? "settingsConfig" : "settingsConfigText";
+    // const arrSettings = Array.from(settingsConfig);
+
+    // arrSettings.forEach(settingConfigOld => {
+    //     const parent = settingConfigOld.parentElement;
+    //     const settingConfigNew = document.createElement(elementType);
+    //     settingConfigNew.innerText = (<HTMLInputElement>settingConfigOld).value;
+    //     settingConfigNew.classList.add(elementClass);
+    //     settingConfigNew.setAttribute("id", settingConfigOld.id);
+    //     if(!modifyingState){
+    //         settingConfigNew.setAttribute("value", settingConfigOld.innerText);
+    //         settingConfigNew.setAttribute("size", "1");
+    //         settingConfigNew.setAttribute("maxlength", "1");
+    //     }
+    //     else if (settingConfigNew.innerText == "" || settingConfigNew.innerText == " " || alreadySetkeys.includes(settingConfigNew.innerText)){
+    //         settingConfigNew.innerText = gameSettings.player.bind[settingConfigNew.id];
+    //     }
+    //     alreadySetkeys.push(settingConfigNew.innerText);
+    //     parent.replaceChild(settingConfigNew, settingConfigOld);
+    // });
+}
+
+//change bind when a keyboard or mouse event is triggered
+function changeBind(event: KeyboardEvent | MouseEvent, bind: string, settingListener: any) {
+    const key = event instanceof KeyboardEvent ? event.key : event.button;
+    gameSettings.player.bind[bind] = key;
+
+    document.removeEventListener("keypress", settingListener);
+    //document.removeEventListener("click", settingListener);
+
+    console.log("EVENT", event);
+    console.log("BIND", bind);
+    //change the text of the button to the new bind
+    const button = document.getElementById(bind);
+    button.innerText = key.toString();
+    setSettinglistener(true);
 }
 
 function goLesFumer() {

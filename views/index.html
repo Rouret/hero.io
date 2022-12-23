@@ -43,7 +43,7 @@
         box-sizing: border-box;
     }
 
-    button {
+    button#start {
         width: 100%;
         background-color: rgb(229, 91, 17);
         color: white;
@@ -146,21 +146,14 @@
     }
 
     .settingsConfig {
-        text-align: center;
-        border: 1px solid #ccc;
+        background-color: rgb(229, 91, 17);
+        color: white;
+        padding: 4px 8px;
+        margin: 8px 0;
+        border: none;
         border-radius: 4px;
-        box-sizing: border-box;
-    } 
-
-    #settingsSave {
-        padding: 7px 10px;
-        margin: 5px 0;
     }
-
-    li p {
-        display: inline;
-        font-weight: bold;
-    }
+    
 
 </style>
 <canvas id="app"></canvas>
@@ -187,16 +180,15 @@
         <h3>Commandes</h3><br>
         <ul>
             <li>souris : Déplacement</li>
-            <li>attaque basique : <p id="basicAttack">clic gauche</p></li>
+            <li>attaque basique : <button class="settingsConfig" id="basicAttack">clic gauche</button></li>
             
-            <li>Attaque principale : <p class="settingsConfigText" id="spell1">a</p></li>
+            <li>Attaque principale : <button class="settingsConfig" id="spell1">a</button></li>
             
-            <li>Attaque secondaire : <p class="settingsConfigText" id="spell2">z</p></li>
+            <li>Attaque secondaire : <button class="settingsConfig" id="spell2">z</button></li>
             
-            <li>Special : <p class="settingsConfigText" id="special">c</p></li>
+            <li>Special : <button class="settingsConfig" id="special">c</button></li>
             
         </ul>
-        <button id="settingsSave">Modifier</button>
     </div>
 </div>
 <img id="player_run" src="assets/player_run.png" style="display: none;">
