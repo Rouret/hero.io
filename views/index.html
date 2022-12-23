@@ -43,7 +43,7 @@
         box-sizing: border-box;
     }
 
-    button {
+    button#start {
         width: 100%;
         background-color: rgb(229, 91, 17);
         color: white;
@@ -144,14 +144,25 @@
         justify-content: space-around;
         align-items: center;
     }
+
+    .settingsConfig {
+        background-color: rgb(229, 91, 17);
+        color: white;
+        padding: 4px 8px;
+        margin: 8px 0;
+        border: none;
+        border-radius: 4px;
+    }
+    
+
 </style>
 <canvas id="app"></canvas>
 <div id="landing">
     <div class="box" id="patch">
         <h3>Patch 0.1.5</h3><br>
         <ul>
-            <li>Descativer les boosts (temporairement)</li>
-            <li>Descativer les balles (temporairement)</li>
+            <li>Desactiver les boosts (temporairement)</li>
+            <li>Desactiver les balles (temporairement)</li>
             <li>Système de caméra dynamique</li>
             <li>Base de la minimap</li>
             <li>Affichage de la limite du terrain</li>
@@ -169,7 +180,14 @@
         <h3>Commandes</h3><br>
         <ul>
             <li>souris : Déplacement</li>
-            <li>click gauche ou espace : Tirer</li>
+            <li>attaque basique : <button class="settingsConfig" id="basicAttack">clic gauche</button></li>
+            
+            <li>Attaque principale : <button class="settingsConfig" id="spell1">a</button></li>
+            
+            <li>Attaque secondaire : <button class="settingsConfig" id="spell2">z</button></li>
+            
+            <li>Special : <button class="settingsConfig" id="special">c</button></li>
+            
         </ul>
     </div>
 </div>
