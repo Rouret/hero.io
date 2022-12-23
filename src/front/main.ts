@@ -164,32 +164,30 @@ function drawPlayer(player: Player) {
         ctx.strokeStyle = "red";
         ctx.stroke();
     }
+    ctx.restore();
 
-    //draw the player name depending on the length of the name
+    //Name
     ctx.font = "20px Arial";
     ctx.fillStyle = "black";
     ctx.textAlign = "center";
-    ctx.fillText(player.name, player.name.length * 5, -player.size / 2 - 10);
+    ctx.fillText(player.name, playerCanvasCoordinate.x, playerCanvasCoordinate.y - player.size / 2 - 10);
 
-    //draw the player life with a red bar
+    //Life
     ctx.fillStyle = "red";
     ctx.fillRect(
-        -player.size / 2,
-        player.size / 2 + 10,
+        playerCanvasCoordinate.x - player.size / 2,
+        playerCanvasCoordinate.y + player.size / 2 + 10,
         player.size,
         10
     );
     ctx.fillStyle = "green";
     ctx.fillRect(
-        -player.size / 2,
-        player.size / 2 + 10,
+        playerCanvasCoordinate.x - player.size / 2,
+        playerCanvasCoordinate.y + player.size / 2 + 10,
         (player.size * player.hp) / player.initHp,
         10
     );
-
-
-    ctx.restore();
-
+    //Mouse Vector
     if (gameSettings.cheat) {
         ctx.beginPath();
         const currentPlayerCanvasCoordinate = convertToCanvasCoordinate(
