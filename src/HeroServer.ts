@@ -3,10 +3,11 @@ import path from "path";
 import http from "http";
 import {Server, Socket} from "socket.io";
 import Game from "./models/Game";
-import Player from "./models/Player";
+import {Player} from "./models/Player";
 import SpellInvocation from "./models/utils/spells/SpellInvocation";
 import SpecialInvocation from "./models/utils/specials/SpecialInvocation";
 import Dimension from "./models/utils/Dimension";
+import {removeAllPrivateProperties} from "./utils";
 
 export default class HeroServer {
     app: express.Application;
@@ -72,7 +73,9 @@ export default class HeroServer {
 
             socket.on("spell", (spellInvocation: SpellInvocation) => {
                 if (currentPlayer === undefined) return;
-                console.log("spell:", spellInvocation.spell.name);
+                this.game.getSpellProfession(currentPlayer.professionType)
+                    .get(spellInvocation.spell.id)
+                    .cast(this.game, currentPlayer, spellInvocation.coordinate);
             });
 
             socket.on("special", (specialInvocation: SpecialInvocation) => {
@@ -91,11 +94,19 @@ export default class HeroServer {
 
     _startGameLoop() {
         setInterval(() => {
-            this.taskLoop.forEach((task) => task.call(this));
+            /*this.taskLoop.forEach((task) => task.call(this));*/
 
-            this.io.emit("update", {
-                players: this.game.players.map((p) => p.move(this.game)),
-            });
+            this.game.players = this.game.players.map((p) => {
+                if (p.id === "test") return p
+                p.move(this.game)
+                return p
+            })
+
+            const payload = {
+                players: this.game.players,
+            }
+
+            this.io.emit("update", removeAllPrivateProperties(payload));
         }, 1000 / this.tickrate);
     }
 

@@ -1,5 +1,5 @@
 import Effect from "./Effect";
-import Player from "../../Player";
+import {Player} from "../../Player";
 
 export enum HealType {
     heal,
@@ -23,7 +23,7 @@ export class HealEffect extends Effect {
                 break;
             case HealType.sustain:
                 //TODO implement sustain
-                currentPlayer.heal(player.hp * (1 / 100))
+                currentPlayer.heal(player.hp * (0.10))
                 break;
         }
     }

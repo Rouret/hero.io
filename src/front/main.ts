@@ -1,5 +1,5 @@
 import io from "socket.io-client";
-import Player from "../models/Player";
+import {Player} from "../models/Player";
 import Dimension from "../models/utils/Dimension";
 import Coordinate from "../models/utils/Coordinate";
 import Vector from "../models/utils/Vector";
@@ -164,6 +164,30 @@ function drawPlayer(player: Player) {
         ctx.strokeStyle = "red";
         ctx.stroke();
     }
+
+    //draw the player name depending on the length of the name
+    ctx.font = "20px Arial";
+    ctx.fillStyle = "black";
+    ctx.textAlign = "center";
+    ctx.fillText(player.name, player.name.length * 5, -player.size / 2 - 10);
+
+    //draw the player life with a red bar
+    ctx.fillStyle = "red";
+    ctx.fillRect(
+        -player.size / 2,
+        player.size / 2 + 10,
+        player.size,
+        10
+    );
+    ctx.fillStyle = "green";
+    ctx.fillRect(
+        -player.size / 2,
+        player.size / 2 + 10,
+        (player.size * player.hp) / player.initHp,
+        10
+    );
+
+
     ctx.restore();
 
     if (gameSettings.cheat) {
@@ -177,14 +201,6 @@ function drawPlayer(player: Player) {
         ctx.strokeStyle = "red";
         ctx.stroke();
     }
-
-    ctx.fillStyle = "black";
-    ctx.font = "20px Arial";
-    ctx.fillText(
-        player.name,
-        playerCanvasCoordinate.x - player.name.length * 5,
-        playerCanvasCoordinate.y - player.size / 2 - 10
-    );
 }
 
 function drawLeaderboard() {
@@ -367,18 +383,18 @@ function manageKeyEventFromPlayer(event) {
         case gameSettings.player.bind.spell1:
             spell = currentPlayer.spells.find((spell) => spell.action === SpellAction.spell1);
             if (spell.type === SpellType.onGround) {
-                spellInvocation = new SpellInvocation(spell, convertToGameCoordinate(mouse, currentPlayer), currentPlayer);
+                spellInvocation = new SpellInvocation(spell, convertToGameCoordinate(mouse, currentPlayer));
             } else {
-                spellInvocation = new SpellInvocation(spell, null, currentPlayer)
+                spellInvocation = new SpellInvocation(spell, null)
             }
             socket.emit("spell", spellInvocation);
             break;
         case gameSettings.player.bind.spell2:
             spell = currentPlayer.spells.find((spell) => spell.action === SpellAction.spell2);
             if (spell.type === SpellType.onGround) {
-                spellInvocation = new SpellInvocation(spell, convertToGameCoordinate(mouse, currentPlayer), currentPlayer);
+                spellInvocation = new SpellInvocation(spell, convertToGameCoordinate(mouse, currentPlayer));
             } else {
-                spellInvocation = new SpellInvocation(spell, null, currentPlayer)
+                spellInvocation = new SpellInvocation(spell, null)
             }
             socket.emit("spell", spellInvocation);
             break;
@@ -462,14 +478,25 @@ function drawSpell(spellInvocation: SpellInvocation) {
     }
 }
 
+function drawUI() {
+    //draw HP BAR
+    ctx.save();
+    ctx.beginPath();
+    ctx.fillStyle = "red";
+    ctx.fillRect(0, 0, currentPlayer.hp, 10);
+    ctx.fill();
+    ctx.closePath();
+    ctx.restore();
+}
+
 
 function manageClickFromPlayer(event: MouseEvent) {
     const spell: Spell = currentPlayer.basicAttackSpell;
     let spellInvocation: SpellInvocation = null;
     if (currentPlayer.special.type === SpellType.onGround) {
-        spellInvocation = new SpellInvocation(spell, convertToGameCoordinate(mouse, currentPlayer), currentPlayer);
+        spellInvocation = new SpellInvocation(spell, convertToGameCoordinate(mouse, currentPlayer));
     } else {
-        spellInvocation = new SpellInvocation(spell, null, currentPlayer);
+        spellInvocation = new SpellInvocation(spell, null);
     }
     socket.emit("spell", spellInvocation);
 

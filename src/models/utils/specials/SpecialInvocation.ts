@@ -1,6 +1,6 @@
 import Special from "./Special";
 import Coordinate from "../Coordinate";
-import Player from "../../Player";
+import {Player} from "../../Player";
 
 export default class SpecialInvocation {
     public special: Special;

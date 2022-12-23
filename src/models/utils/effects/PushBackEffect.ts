@@ -1,5 +1,5 @@
 import Effect from "./Effect";
-import Player from "../../Player";
+import {Player} from "../../Player";
 
 export enum PushBackType {
     pushBack1 = 5,

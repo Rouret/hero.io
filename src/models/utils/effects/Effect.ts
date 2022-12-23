@@ -1,4 +1,4 @@
-import Player from "../../Player";
+import {Player} from "../../Player";
 
 export default abstract class Effect {
     abstract apply(player: Player, currentPlayer: Player): void;
