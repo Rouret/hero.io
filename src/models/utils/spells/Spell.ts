@@ -15,7 +15,6 @@ export default class Spell {
     public type: SpellType;
     public action: SpellAction;
 
-    private _currentPlayer: Player;
     private _playersHit: Array<Player> = [];
 
     public constructor(
@@ -28,7 +27,6 @@ export default class Spell {
         effect: Effect,
         type: SpellType,
         action: SpellAction,
-        currentPlayer: Player
     ) {
         this.name = name;
         this.description = description;
@@ -39,7 +37,6 @@ export default class Spell {
         this.type = type;
         this.action = action;
 
-        this._currentPlayer = currentPlayer;
     }
 
     public cast(players: Array<Player>, currentPlayer: Player, game: Game) {

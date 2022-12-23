@@ -37,8 +37,7 @@ export default class Warrior extends Player {
             new SemiCircleShape(50),
             new PushBackEffect(PushBackType.pushBack1),
             SpellType.onCharacter,
-            SpellAction.basicAttack,
-            this
+            SpellAction.basicAttack
         );
 
         const firstSpell = new Spell(
@@ -50,8 +49,7 @@ export default class Warrior extends Player {
             new CircleShape(50),
             new PushBackEffect(PushBackType.pushBack1),
             SpellType.onCharacter,
-            SpellAction.spell1,
-            this
+            SpellAction.spell1
         );
 
         const secondSpell = new Spell(
@@ -63,8 +61,7 @@ export default class Warrior extends Player {
             new RectangleShape(125, 25),
             new HealEffect(HealType.sustain, null),
             SpellType.onCharacter,
-            SpellAction.spell2,
-            this
+            SpellAction.spell2
         );
 
         const spells = [firstSpell, secondSpell];
