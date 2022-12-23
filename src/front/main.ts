@@ -108,6 +108,10 @@ function drawPlayer(player: Player) {
     const coefAceSpeed = Math.floor(player.speed / player.initSpeed);
     const ajustedFPS = Math.floor(gameSettings.fps / coefAceSpeed);
     const ajustedFrameIndex = frameIndex % ajustedFPS;
+    const playerCanvasCoordinate = convertToCanvasCoordinate(
+        player.coordinate,
+        currentPlayer
+    );
 
     const playerRunImageFrameIndex = Math.floor(
         (ajustedFrameIndex * (gameSettings.player.animation.playerRunImageFrame - 1)) / ajustedFPS
@@ -117,7 +121,7 @@ function drawPlayer(player: Player) {
         playerRunImageFrameIndex * gameSettings.player.animation.playerRunImageFrameWidth;
 
     ctx.save();
-    ctx.translate(player.coordinate.x, player.coordinate.y);
+    ctx.translate(playerCanvasCoordinate.x, playerCanvasCoordinate.y);
     if (Math.abs(player.rotation) > Math.PI / 2) {
         ctx.scale(-1, 1);
     }
@@ -134,7 +138,7 @@ function drawPlayer(player: Player) {
     );
 
     //draw a red cirlce around the player
-    if (gameSettings.cheat) {
+    if (gameSettings.cheat && player.id === currentPlayer.id) {
         ctx.beginPath();
         ctx.arc(0, 0, 50, 0, 2 * Math.PI);
         ctx.strokeStyle = "green";
@@ -164,7 +168,11 @@ function drawPlayer(player: Player) {
 
     if (gameSettings.cheat) {
         ctx.beginPath();
-        ctx.moveTo(player.coordinate.x, player.coordinate.y);
+        const currentPlayerCanvasCoordinate = convertToCanvasCoordinate(
+            currentPlayer.coordinate,
+            currentPlayer
+        );
+        ctx.moveTo(currentPlayerCanvasCoordinate.x, currentPlayerCanvasCoordinate.y);
         ctx.lineTo(mouse.x, mouse.y);
         ctx.strokeStyle = "red";
         ctx.stroke();
@@ -174,8 +182,8 @@ function drawPlayer(player: Player) {
     ctx.font = "20px Arial";
     ctx.fillText(
         player.name,
-        player.coordinate.x - player.name.length * 5,
-        player.coordinate.y - player.size / 2 - 10
+        playerCanvasCoordinate.x - player.name.length * 5,
+        playerCanvasCoordinate.y - player.size / 2 - 10
     );
 }
 
@@ -194,10 +202,6 @@ function drawLeaderboard() {
 }
 
 function drawMiniMap() {
-    const miniMapPlayerSize = currentPlayer.size * gameSettings.minimap.miniMapRatio;
-    const miniMapPlayerX = currentPlayer.coordinate.x * gameSettings.minimap.miniMapRatio;
-    const miniMapPlayerY = currentPlayer.coordinate.y * gameSettings.minimap.miniMapRatio;
-
     //Mini map
     ctx.save();
     ctx.translate(canvas.width - gameSettings.minimap.miniMapSize, canvas.height - gameSettings.minimap.miniMapSize);
@@ -208,6 +212,11 @@ function drawMiniMap() {
     ctx.fillRect(0, 0, 1, gameSettings.minimap.miniMapSize);
     ctx.fillRect(gameSettings.minimap.miniMapSize - 1, 0, 1, gameSettings.minimap.miniMapSize);
     ctx.fillRect(0, gameSettings.minimap.miniMapSize - 1, gameSettings.minimap.miniMapSize, 1);
+
+    //Window and current player
+    const miniMapPlayerSize = currentPlayer.size * gameSettings.minimap.miniMapRatio;
+    const miniMapPlayerX = currentPlayer.coordinate.x * gameSettings.minimap.miniMapRatio;
+    const miniMapPlayerY = currentPlayer.coordinate.y * gameSettings.minimap.miniMapRatio;
 
     if (gameSettings.cheat) {
         ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
@@ -223,23 +232,23 @@ function drawMiniMap() {
     ctx.beginPath();
     ctx.arc(miniMapPlayerX, miniMapPlayerY, miniMapPlayerSize, 0, 2 * Math.PI);
     ctx.closePath();
+    ctx.fill();
+
 
     if (gameSettings.cheat) {
-        gameState.players.filter(player => player.id !== currentPlayer.id)
-            .forEach(player => {
-                const miniMapPlayerSize = player.size * gameSettings.minimap.miniMapRatio;
-                const miniMapPlayerX = player.coordinate.x * gameSettings.minimap.miniMapRatio;
-                const miniMapPlayerY = player.coordinate.y * gameSettings.minimap.miniMapRatio;
+        gameState.players.forEach(player => {
+            if (player.id === currentPlayer.id) return
+            const miniMapPlayerX = player.coordinate.x * gameSettings.minimap.miniMapRatio;
+            const miniMapPlayerY = player.coordinate.y * gameSettings.minimap.miniMapRatio;
 
-                ctx.fillStyle = "red";
-                ctx.beginPath();
-                ctx.arc(miniMapPlayerX, miniMapPlayerY, miniMapPlayerSize, 0, 2 * Math.PI);
-                ctx.closePath();
-                ctx.fill();
-            })
+            ctx.fillStyle = "red";
+            ctx.beginPath();
+            ctx.arc(miniMapPlayerX, miniMapPlayerY, miniMapPlayerSize, 0, 2 * Math.PI);
+            ctx.closePath();
+            ctx.fill();
+        });
     }
 
-    ctx.fill();
     ctx.restore();
 }
 
@@ -524,15 +533,6 @@ function init() {
                 {},
                 gameState.players.find((player) => player.id === currentPlayer.id)
             );
-
-            gameState.players.map((player) => {
-                player.coordinate = convertToCanvasCoordinate(
-                    player.coordinate,
-                    currentPlayer
-                );
-
-                return player;
-            });
         }
 
         gameState.needToDraw = true;

@@ -6,6 +6,7 @@ import Game from "./models/Game";
 import Player from "./models/Player";
 import SpellInvocation from "./models/utils/spells/SpellInvocation";
 import SpecialInvocation from "./models/utils/specials/SpecialInvocation";
+import Dimension from "./models/utils/Dimension";
 
 export default class HeroServer {
     app: express.Application;
@@ -104,6 +105,8 @@ export default class HeroServer {
         this._setupSocket();
 
         this._startGameLoop();
+
+        this.game.addPlayer("test", new Dimension(1000, 1000), "test");
 
         this.server.listen(this.port, () => {
             console.log(`listening on *:${this.port}`);
