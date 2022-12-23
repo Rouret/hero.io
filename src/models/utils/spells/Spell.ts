@@ -17,6 +17,9 @@ export default class Spell {
     public effect: Effect;
     public type: SpellType;
     public action: SpellAction;
+    public onCooldown: boolean;
+    public onCast: boolean;
+    public cooldownTime: number;
 
     private _playersHit: Array<Player> = [];
 
@@ -42,9 +45,26 @@ export default class Spell {
         this.type = type;
         this.action = action;
 
+        this.cooldownTime = 0;
+        this.onCooldown = false;
+        this.onCast = false;
+
+    }
+
+    update() {
+        if (this.onCooldown) {
+            this.cooldownTime += 1;
+            if (this.cooldownTime >= this.cooldown) {
+                this.cooldownTime = 0;
+                this.onCooldown = false;
+            }
+            
+        }
     }
 
     cast(game: Game, currentPlayer: Player, spellCoordinate: Coordinate) {
+        if (this.onCooldown || this.onCast) return;
+        this.onCast = true;
         //get players in shape
         this._playersHit = game.players.filter((p) => {
             if (p.id === currentPlayer.id) return false;
@@ -54,8 +74,6 @@ export default class Spell {
                 return this.shape.isInside(p.coordinate, spellCoordinate, currentPlayer.rotation);
             }
         })
-
-        console.log(this._playersHit.map(p => p.name))
 
         //Extra effect
         switch (this.action) {
@@ -75,12 +93,18 @@ export default class Spell {
             this.effect.apply(p, currentPlayer);
         })
 
+        this.endCast(this._playersHit, currentPlayer, game);
+
     }
 
     endCast(players: Array<Player>, currentPlayer: Player, game: Game) {
         this._playersHit.forEach((p) => {
             this.effect.remove(p, currentPlayer);
         })
+
+        this.onCooldown = true;
+        this.onCast = false;
+        this._playersHit = [];
     }
 
 

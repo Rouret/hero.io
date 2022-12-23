@@ -9,7 +9,7 @@ export const randomId = function () {
 }
 
 export const removeAllPrivateProperties = function (object: any) {
-    for (let key in object) {
+    for (const key in object) {
         if (object.hasOwnProperty(key)) {
             if (key.startsWith("_")) {
                 delete object[key];
@@ -22,9 +22,14 @@ export const removeAllPrivateProperties = function (object: any) {
     return object;
 }
 
+export const convertSecondToTick = function (second: number, tickrate: number) {
+    return Math.floor(second * tickrate);
+}
+
 
 module.exports = {
     random,
     randomId,
-    removeAllPrivateProperties
+    removeAllPrivateProperties,
+    convertSecondToTick
 };

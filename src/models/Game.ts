@@ -14,16 +14,19 @@ import {HealEffect, HealType} from "./utils/effects/HealEffect";
 import SpellProfession from "./utils/SpellProfession";
 import Dash from "./utils/specials/Dash";
 import BlockEffect from "./utils/effects/BlockEffect";
+import {convertSecondToTick} from "../utils";
 
 export default class Game {
     players: Player[];
     spells: Array<SpellProfession> = [];
     specials: Array<Special> = [];
     worldDimension: Dimension;
+    tickrate: number;
 
-    constructor() {
+    constructor(tickrate: number) {
         this.players = [];
         this.worldDimension = new Dimension(3000, 3000);
+        this.tickrate = tickrate;
         this._registerSpells()
     }
 
@@ -48,8 +51,8 @@ export default class Game {
         const basicAttackSpell = new Spell(
             "Sword strike",
             "PushBack the enemies in front of you",
-            1.25,
-            1.25,
+            convertSecondToTick(1.25, this.tickrate),
+            convertSecondToTick(1.25, this.tickrate),
             10,
             new SemiCircleShape(50),
             new PushBackEffect(PushBackType.pushBack1),
@@ -60,8 +63,8 @@ export default class Game {
         const firstSpell = new Spell(
             "Sword swing",
             "PushBack the enemies around you",
-            0.75,
-            4,
+            convertSecondToTick(0.75, this.tickrate),
+            convertSecondToTick(4, this.tickrate),
             40,
             new CircleShape(50),
             new PushBackEffect(PushBackType.pushBack1),
@@ -72,8 +75,8 @@ export default class Game {
         const secondSpell = new Spell(
             "Sword slash",
             "Heal yourself (1% of each enemy's hp)",
-            1,
-            2.5,
+            convertSecondToTick(1, this.tickrate),
+            convertSecondToTick(2.5, this.tickrate),
             15,
             new RectangleShape(125, 25),
             new HealEffect(HealType.sustain, null),
@@ -84,7 +87,7 @@ export default class Game {
         const special = new Dash(
             "Dash for my life",
             "Dash forward (block all incoming damage during the dash)",
-            15,
+            convertSecondToTick(15, this.tickrate),
             200,
             new BlockEffect(),
             SpellType.onCharacter,

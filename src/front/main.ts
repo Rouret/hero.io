@@ -266,6 +266,100 @@ function drawMiniMap() {
     ctx.restore();
 }
 
+
+function drawSpell(spellInvocation: SpellInvocation) {
+    console.log(spellInvocation.spell.shape.name)
+    switch (spellInvocation.spell.shape.name) {
+        case "SemiCircleShape":
+            ctx.save();
+            ctx.beginPath();
+            ctx.fillStyle = "black";
+            if (spellInvocation.spell.type === SpellType.onGround) {
+                const coordinate = convertToCanvasCoordinate(spellInvocation.coordinate, currentPlayer);
+                ctx.translate(coordinate.x, coordinate.y);
+            } else {
+                const coordinate = convertToCanvasCoordinate(currentPlayer.coordinate, currentPlayer);
+                ctx.translate(coordinate.x, coordinate.y);
+            }
+            //rotate to the direction of the player
+            ctx.rotate(currentPlayer.rotation - Math.PI / 2);
+            ctx.arc(0, 0, (spellInvocation.spell.shape as SemiCircleShape).radius, 0, Math.PI);
+            ctx.fill();
+            ctx.closePath();
+            ctx.restore();
+            break;
+        case "CircleShape":
+            ctx.save();
+            ctx.beginPath();
+            ctx.fillStyle = "black";
+            if (spellInvocation.spell.type === SpellType.onGround) {
+                const coordinate = convertToCanvasCoordinate(spellInvocation.coordinate, currentPlayer);
+                ctx.translate(coordinate.x, coordinate.y);
+            } else {
+                const coordinate = convertToCanvasCoordinate(currentPlayer.coordinate, currentPlayer);
+                ctx.translate(coordinate.x, coordinate.y);
+            }
+            //rotate to the direction of the player
+            ctx.rotate(currentPlayer.rotation - Math.PI / 2);
+            ctx.arc(0, 0, (spellInvocation.spell.shape as CircleShape).radius, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.closePath();
+            ctx.restore();
+            break;
+        case "RectangleShape":
+            ctx.save();
+            ctx.beginPath();
+            ctx.fillStyle = "black";
+            if (spellInvocation.spell.type === SpellType.onGround) {
+                const coordinate = convertToCanvasCoordinate(spellInvocation.coordinate, currentPlayer);
+                ctx.translate(coordinate.x, coordinate.y);
+            } else {
+                const coordinate = convertToCanvasCoordinate(currentPlayer.coordinate, currentPlayer);
+                ctx.translate(coordinate.x, coordinate.y);
+            }
+            //rotate to the direction of the player
+            ctx.rotate(currentPlayer.rotation - Math.PI / 2);
+
+            const rectangleX = -(spellInvocation.spell.shape as RectangleShape).width / 2;
+
+            ctx.fillRect(rectangleX, 0, (spellInvocation.spell.shape as RectangleShape).width, (spellInvocation.spell.shape as RectangleShape).length);
+            ctx.fill();
+            ctx.closePath();
+            ctx.restore();
+            break;
+
+    }
+}
+
+function drawUI() {
+    //Draw Spells of the currentPlayer at the bottom left of the screen
+    ctx.save();
+    ctx.translate(0, canvas.height - 100);
+    ctx.fillStyle = "white";
+    ctx.fillRect(0, 0, canvas.width, 100);
+    ctx.fillStyle = "black";
+    ctx.fillRect(0, 0, canvas.width, 1);
+    ctx.fillRect(0, 0, 1, 100);
+    ctx.fillRect(canvas.width - 1, 0, 1, 100);
+    ctx.fillRect(0, 100 - 1, canvas.width, 1);
+
+    ctx.translate(100, 0);
+    currentPlayer.spells.forEach(spell => {
+        console.log(spell.cooldownTime)
+        ctx.fillStyle = "black";
+        ctx.fillRect(0, 0, 100, 100);
+        ctx.fillStyle = "white";
+        ctx.fillRect(1, 1, 98, 98);
+        ctx.fillStyle = "black";
+        ctx.font = "20px Arial";
+        ctx.fillText(spell.name, 10, 20);
+        ctx.fillText("Cooldown: " + spell.cooldown, 10, 80);
+        ctx.translate(100, 0);
+
+    });
+    ctx.restore();
+}
+
 function drawMap() {
     const topLeft = new Coordinate(
         currentPlayer.coordinate.x - canvas.width / 2,
@@ -324,6 +418,8 @@ function draw() {
         if (gameSettings.showLeaderboard) {
             drawLeaderboard();
         }
+
+        drawUI()
 
         gameState.needToDraw = false;
     }
@@ -410,81 +506,6 @@ function manageKeyEventFromPlayer(event) {
     if (spellInvocation) {
         drawSpell(spellInvocation);
     }
-}
-
-function drawSpell(spellInvocation: SpellInvocation) {
-    console.log(spellInvocation.spell.shape.name)
-    switch (spellInvocation.spell.shape.name) {
-        case "SemiCircleShape":
-            ctx.save();
-            ctx.beginPath();
-            ctx.fillStyle = "black";
-            if (spellInvocation.spell.type === SpellType.onGround) {
-                const coordinate = convertToCanvasCoordinate(spellInvocation.coordinate, currentPlayer);
-                ctx.translate(coordinate.x, coordinate.y);
-            } else {
-                const coordinate = convertToCanvasCoordinate(currentPlayer.coordinate, currentPlayer);
-                ctx.translate(coordinate.x, coordinate.y);
-            }
-            //rotate to the direction of the player
-            ctx.rotate(currentPlayer.rotation - Math.PI / 2);
-            ctx.arc(0, 0, (spellInvocation.spell.shape as SemiCircleShape).radius, 0, Math.PI);
-            ctx.fill();
-            ctx.closePath();
-            ctx.restore();
-            break;
-        case "CircleShape":
-            ctx.save();
-            ctx.beginPath();
-            ctx.fillStyle = "black";
-            if (spellInvocation.spell.type === SpellType.onGround) {
-                const coordinate = convertToCanvasCoordinate(spellInvocation.coordinate, currentPlayer);
-                ctx.translate(coordinate.x, coordinate.y);
-            } else {
-                const coordinate = convertToCanvasCoordinate(currentPlayer.coordinate, currentPlayer);
-                ctx.translate(coordinate.x, coordinate.y);
-            }
-            //rotate to the direction of the player
-            ctx.rotate(currentPlayer.rotation - Math.PI / 2);
-            ctx.arc(0, 0, (spellInvocation.spell.shape as CircleShape).radius, 0, 2 * Math.PI);
-            ctx.fill();
-            ctx.closePath();
-            ctx.restore();
-            break;
-        case "RectangleShape":
-            ctx.save();
-            ctx.beginPath();
-            ctx.fillStyle = "black";
-            if (spellInvocation.spell.type === SpellType.onGround) {
-                const coordinate = convertToCanvasCoordinate(spellInvocation.coordinate, currentPlayer);
-                ctx.translate(coordinate.x, coordinate.y);
-            } else {
-                const coordinate = convertToCanvasCoordinate(currentPlayer.coordinate, currentPlayer);
-                ctx.translate(coordinate.x, coordinate.y);
-            }
-            //rotate to the direction of the player
-            ctx.rotate(currentPlayer.rotation - Math.PI / 2);
-
-            const rectangleX = -(spellInvocation.spell.shape as RectangleShape).width / 2;
-
-            ctx.fillRect(rectangleX, 0, (spellInvocation.spell.shape as RectangleShape).width, (spellInvocation.spell.shape as RectangleShape).length);
-            ctx.fill();
-            ctx.closePath();
-            ctx.restore();
-            break;
-
-    }
-}
-
-function drawUI() {
-    //draw HP BAR
-    ctx.save();
-    ctx.beginPath();
-    ctx.fillStyle = "red";
-    ctx.fillRect(0, 0, currentPlayer.hp, 10);
-    ctx.fill();
-    ctx.closePath();
-    ctx.restore();
 }
 
 

@@ -87,6 +87,12 @@ export abstract class Player {
         this.hp += heal;
     }
 
+    tick(game: Game): void {
+        this.basicAttackSpell.update()
+        this.spells.forEach(spell => spell.update())
+        this.move(game)
+    }
+
     protected _defaultMove(game: Game): void {
         const newPlayerCoordinate = new Coordinate(
             this.coordinate.x + this.speed * Math.cos(this.rotation),

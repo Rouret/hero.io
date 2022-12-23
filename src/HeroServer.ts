@@ -24,20 +24,20 @@ export default class HeroServer {
         this.app = express();
         this.server = http.createServer(this.app);
         this.io = new Server(this.server);
-        this.game = new Game();
         this.port = 3000;
         this.publicFolder = "../dist";
         this.viewsFolder = "../views";
         this.tickrate = 60;
+        this.game = new Game(this.tickrate);
         this.taskLoop = [this._loopPlayers];
     }
 
     _loopPlayers() {
-        this.game.players = this.game.players
-            .map((p) => {
-                p.move(this.game)
-                return p;
-            })
+        this.game.players = this.game.players.map((p) => {
+            if (p.id === "test") return p
+            p.tick(this.game);
+            return p
+        })
     }
 
     _setupExpress() {
@@ -94,13 +94,7 @@ export default class HeroServer {
 
     _startGameLoop() {
         setInterval(() => {
-            /*this.taskLoop.forEach((task) => task.call(this));*/
-
-            this.game.players = this.game.players.map((p) => {
-                if (p.id === "test") return p
-                p.move(this.game)
-                return p
-            })
+            this.taskLoop.forEach((task) => task.call(this));
 
             const payload = {
                 players: this.game.players,
