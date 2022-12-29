@@ -1,4 +1,4 @@
-import Effect from "./Effect";
+import {Effect, EffectTarget, EffectType} from "./Effect";
 import {Player} from "../../Player";
 
 export enum HealType {
@@ -11,7 +11,7 @@ export class HealEffect extends Effect {
     healValue: number;
 
     constructor(healType: HealType, healValue: number) {
-        super();
+        super(EffectTarget.onCurrentPlayer, EffectType.atTheEndOfCast);
         this.healType = healType;
         this.healValue = healValue;
     }

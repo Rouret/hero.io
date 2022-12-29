@@ -3,9 +3,9 @@ import Dimension from "./utils/Dimension";
 import Game from "./Game";
 import Spell from "./utils/spells/Spell";
 import Special from "./utils/specials/Special";
-import Effect from "./utils/effects/Effect";
 import BlockEffect from "./utils/effects/BlockEffect";
 import SpellInvocation from "./utils/spells/SpellInvocation";
+import {Effect} from "./utils/effects/Effect";
 
 export enum ProfessionType {
     warrior = "warrior",
@@ -57,7 +57,8 @@ export abstract class Player {
         this.rotation = 0;
         this.onCast = false;
 
-        this._registerSpells();
+        this.spells = this._registerSpells();
+        this.special = this._registerSpecial();
     }
 
     public abstract move(game: Game): Player;
@@ -69,6 +70,10 @@ export abstract class Player {
             this.onCast = true;
             spell.cast(game, this, spellInvocation.coordinate);
         }
+    }
+
+    public castSpecial(specialInvocation, game: Game): void {
+
     }
 
     public takeDamage(damage: number): void {
@@ -108,13 +113,10 @@ export abstract class Player {
         return this.spells.find(s => s.id === id);
     }
 
-    public setSpell(spell: Spell): void {
-        const spellIndex = this.spells.findIndex(s => s.id === spell.id);
-        //no reference
-        this.spells[spellIndex] = spell;
-    }
 
-    protected abstract _registerSpells(): void;
+    protected abstract _registerSpells(): Array<Spell>;
+
+    protected abstract _registerSpecial(): Special;
 
     protected _defaultMove(game: Game): void {
         const newPlayerCoordinate = new Coordinate(
@@ -132,7 +134,6 @@ export abstract class Player {
         }
 
         this.coordinate = newPlayerCoordinate;
-
     }
 
 }

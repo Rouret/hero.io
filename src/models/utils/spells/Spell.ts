@@ -1,4 +1,4 @@
-import Effect from "../effects/Effect";
+import {Effect, EffectType} from "../effects/Effect";
 import Shape from "../shapes/Shape";
 import {SpellType} from "./SpellType";
 import {SpellAction} from "./SpellAction";
@@ -74,16 +74,8 @@ export default class Spell {
         }
     }
 
-    cast(game: Game, currentPlayer: Player, spellCoordinate: Coordinate) {
-        if (this.onCooldown || this.onCast) return;
-        this.onCast = true;
-        this._spellCoordinate = clone(spellCoordinate);
-        this._initPlayerRotation = currentPlayer.rotation
-    }
-
-    endCast(game: Game, currentPlayer: Player) {
-        //Get players in shape
-        const playersHit = game.players.filter((p) => {
+    getPlayersHit(game: Game, currentPlayer: Player): Array<Player> {
+        return game.players.filter((p) => {
             if (p.id === currentPlayer.id) return false;
             if (this.type === SpellType.onCharacter) {
                 return this.shape.isInside(p.coordinate, currentPlayer.coordinate, this._initPlayerRotation);
@@ -91,12 +83,45 @@ export default class Spell {
                 return this.shape.isInside(p.coordinate, this._spellCoordinate, currentPlayer.rotation);
             }
         })
+    }
 
+    applyEffect(game: Game, currentPlayer: Player) {
+        if (this.type === SpellType.onCharacter) {
+            this.getPlayersHit(game, currentPlayer).forEach((p) => {
+                this.effect.apply(currentPlayer, currentPlayer);
+            })
+        } else {
+            this.getPlayersHit(game, currentPlayer).forEach((p) => {
+                this.effect.apply(p, currentPlayer);
+            })
+        }
+    }
+
+    cast(game: Game, currentPlayer: Player, spellCoordinate: Coordinate) {
+        if (this.onCooldown || this.onCast) return;
+        this.onCast = true;
+
+        if (this.effect.effectType === EffectType.atTheStartOfCast || this.effect.effectType === EffectType.duringCast) {
+            this.applyEffect(game, currentPlayer);
+        }
+
+        this._spellCoordinate = clone(spellCoordinate);
+        this._initPlayerRotation = currentPlayer.rotation
+    }
+
+    endCast(game: Game, currentPlayer: Player) {
         //Effect on each player
-        playersHit.forEach((p) => {
+        this.getPlayersHit(game, currentPlayer).forEach((p) => {
             p.takeDamage(this.damage);
             this.effect.apply(p, currentPlayer);
         })
+
+        if (this.effect.effectType === EffectType.atTheEndOfCast) {
+            this.applyEffect(game, currentPlayer);
+        }
+        if (this.effect.effectType === EffectType.duringCast) {
+            this.effect.remove(currentPlayer, currentPlayer)
+        }
 
         this.onCooldown = true;
         this.onCast = false;

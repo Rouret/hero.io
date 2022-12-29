@@ -11,6 +11,7 @@ import {SpellAction} from "../utils/spells/SpellAction";
 import CircleShape from "../utils/shapes/CircleShape";
 import RectangleShape from "../utils/shapes/RectangleShape";
 import {HealEffect, HealType} from "../utils/effects/HealEffect";
+import Special from "../utils/specials/Special";
 import Dash from "../utils/specials/Dash";
 import BlockEffect from "../utils/effects/BlockEffect";
 
@@ -34,7 +35,7 @@ export default class Warrior extends Player {
         return this;
     }
 
-    protected _registerSpells(): void {
+    protected _registerSpells(): Array<Spell> {
         const autoAttack = new Spell(
             "Sword strike",
             "PushBack the enemies in front of you",
@@ -71,9 +72,11 @@ export default class Warrior extends Player {
             SpellAction.spell2
         );
 
-        this.spells = [autoAttack, firstSpell, secondSpell];
+        return [autoAttack, firstSpell, secondSpell];
+    }
 
-        this.special = new Dash(
+    protected _registerSpecial(): Special {
+        return new Dash(
             "Dash for my life",
             "Dash forward (block all incoming damage during the dash)",
             convertSecondToTick(15, Game.tickrate),

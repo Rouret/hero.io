@@ -1,4 +1,4 @@
-import Effect from "./Effect";
+import {Effect, EffectTarget, EffectType} from "./Effect";
 import {Player} from "../../Player";
 
 export enum PushBackType {
@@ -12,7 +12,7 @@ export class PushBackEffect extends Effect {
     pushBackType: PushBackType;
 
     constructor(pushBackType: PushBackType) {
-        super();
+        super(EffectTarget.onPlayer, EffectType.atTheEndOfCast);
         this.pushBackType = pushBackType;
     }
 
