@@ -1,102 +1,27 @@
 import Dimension from './utils/Dimension';
 import Coordinate from './utils/Coordinate';
 import Warrior from "./professions/Warrior";
-import {Player, ProfessionType} from "./Player";
-import Spell from "./utils/spells/Spell";
-import Special from "./utils/specials/Special";
-import SemiCircleShape from "./utils/shapes/SemiCircleShape";
-import {PushBackEffect, PushBackType} from "./utils/effects/PushBackEffect";
-import {SpellType} from "./utils/spells/SpellType";
-import {SpellAction} from "./utils/spells/SpellAction";
-import CircleShape from "./utils/shapes/CircleShape";
-import RectangleShape from "./utils/shapes/RectangleShape";
-import {HealEffect, HealType} from "./utils/effects/HealEffect";
-import SpellProfession from "./utils/SpellProfession";
-import Dash from "./utils/specials/Dash";
-import BlockEffect from "./utils/effects/BlockEffect";
-import {convertSecondToTick} from "../utils";
+import {Player} from "./Player";
 
 export default class Game {
+    static tickrate: number;
     players: Player[];
-    spells: Array<SpellProfession> = [];
-    specials: Array<Special> = [];
     worldDimension: Dimension;
-    tickrate: number;
 
     constructor(tickrate: number) {
         this.players = [];
         this.worldDimension = new Dimension(3000, 3000);
-        this.tickrate = tickrate;
-        this._registerSpells()
+        Game.tickrate = tickrate;
     }
 
     addPlayer(id: string, window: Dimension, name: string) {
         //const playerCoordinate = new Coordinate(random(0, this.worldDimension.width), random(0, this.worldDimension.height))
         //DEBUG
         const playerCoordinate = new Coordinate(Math.floor(this.worldDimension.width / 2), Math.floor(this.worldDimension.width / 2))
-        const player = new Warrior(id, name, playerCoordinate, 50, window, this.getSpellProfession(ProfessionType.warrior).spells, this.getSpellProfession(ProfessionType.warrior).special);
+        const player = new Warrior(id, name, playerCoordinate, 50, window);
         this.players.push(player);
         return player;
     }
 
-    getSpellProfession(profession: ProfessionType): SpellProfession {
-        return this.spells.find(spellProfession => spellProfession.professionType === profession);
-    }
 
-    _registerSpells() {
-        this._registerWarriorSpells();
-    }
-
-    _registerWarriorSpells() {
-        const basicAttackSpell = new Spell(
-            "Sword strike",
-            "PushBack the enemies in front of you",
-            convertSecondToTick(1.25, this.tickrate),
-            convertSecondToTick(1.25, this.tickrate),
-            10,
-            new SemiCircleShape(50),
-            new PushBackEffect(PushBackType.pushBack1),
-            SpellType.onCharacter,
-            SpellAction.basicAttack
-        );
-
-        const firstSpell = new Spell(
-            "Sword swing",
-            "PushBack the enemies around you",
-            convertSecondToTick(0.75, this.tickrate),
-            convertSecondToTick(4, this.tickrate),
-            40,
-            new CircleShape(50),
-            new PushBackEffect(PushBackType.pushBack1),
-            SpellType.onCharacter,
-            SpellAction.spell1
-        );
-
-        const secondSpell = new Spell(
-            "Sword slash",
-            "Heal yourself (1% of each enemy's hp)",
-            convertSecondToTick(1, this.tickrate),
-            convertSecondToTick(2.5, this.tickrate),
-            15,
-            new RectangleShape(125, 25),
-            new HealEffect(HealType.sustain, null),
-            SpellType.onCharacter,
-            SpellAction.spell2
-        );
-
-        const special = new Dash(
-            "Dash for my life",
-            "Dash forward (block all incoming damage during the dash)",
-            convertSecondToTick(15, this.tickrate),
-            200,
-            new BlockEffect(),
-            SpellType.onCharacter,
-            SpellAction.special
-        );
-
-        this.spells.push(
-            new SpellProfession(ProfessionType.warrior, [basicAttackSpell, firstSpell, secondSpell], special)
-        );
-
-    }
 }

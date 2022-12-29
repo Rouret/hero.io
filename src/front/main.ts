@@ -4,13 +4,13 @@ import Dimension from "../models/utils/Dimension";
 import Coordinate from "../models/utils/Coordinate";
 import Vector from "../models/utils/Vector";
 import SpellInvocation from "../models/utils/spells/SpellInvocation";
-import Spell from "../models/utils/spells/Spell";
 import {SpellAction} from "../models/utils/spells/SpellAction";
 import {SpellType} from "../models/utils/spells/SpellType";
 import SpecialInvocation from "../models/utils/specials/SpecialInvocation";
 import SemiCircleShape from "../models/utils/shapes/SemiCircleShape";
 import CircleShape from "../models/utils/shapes/CircleShape";
 import RectangleShape from "../models/utils/shapes/RectangleShape";
+import {clone} from "../utils";
 
 const socket = io();
 
@@ -164,6 +164,8 @@ function drawPlayer(player: Player) {
         ctx.strokeStyle = "red";
         ctx.stroke();
     }
+
+
     ctx.restore();
 
     //Name
@@ -268,7 +270,7 @@ function drawMiniMap() {
 
 
 function drawSpell(spellInvocation: SpellInvocation) {
-    console.log(spellInvocation.spell.shape.name)
+    //TODO REFACTO
     switch (spellInvocation.spell.shape.name) {
         case "SemiCircleShape":
             ctx.save();
@@ -327,7 +329,6 @@ function drawSpell(spellInvocation: SpellInvocation) {
             ctx.closePath();
             ctx.restore();
             break;
-
     }
 }
 
@@ -342,22 +343,33 @@ function drawUI() {
     ctx.fillRect(0, 0, 1, 100);
     ctx.fillRect(canvas.width - 1, 0, 1, 100);
     ctx.fillRect(0, 100 - 1, canvas.width, 1);
-
-    ctx.translate(100, 0);
-    currentPlayer.spells.forEach(spell => {
-        console.log(spell.cooldownTime)
-        ctx.fillStyle = "black";
-        ctx.fillRect(0, 0, 100, 100);
-        ctx.fillStyle = "white";
-        ctx.fillRect(1, 1, 98, 98);
-        ctx.fillStyle = "black";
-        ctx.font = "20px Arial";
-        ctx.fillText(spell.name, 10, 20);
-        ctx.fillText("Cooldown: " + spell.cooldown, 10, 80);
-        ctx.translate(100, 0);
-
-    });
     ctx.restore();
+
+    for (let i = 0; i < currentPlayer.spells.length; i++) {
+        ctx.save();
+        ctx.translate(0, canvas.height - 100);
+        ctx.translate(10 + i * 100, 10);
+        if (currentPlayer.onCast) {
+            if (currentPlayer.spells[i].onCast) {
+                //Spell is onCast
+                ctx.fillStyle = "blue";
+            } else {
+                //Can't the other spells
+                ctx.fillStyle = "orange";
+            }
+        } else {
+            //Cooldown
+            ctx.fillStyle = currentPlayer.spells[i].onCooldown ? "red" : "green";
+        }
+
+        ctx.fillRect(0, 0, 80, 80);
+        ctx.fillStyle = "black";
+        ctx.fillRect(0, 0, 80, 1);
+        ctx.fillRect(0, 0, 1, 80);
+        ctx.fillRect(80 - 1, 0, 1, 80);
+        ctx.fillRect(0, 80 - 1, 80, 1);
+        ctx.restore();
+    }
 }
 
 function drawMap() {
@@ -411,6 +423,8 @@ function draw() {
 
         drawMap();
 
+        drawUI();
+
         if (gameSettings.showMiniMap) {
             drawMiniMap();
         }
@@ -419,7 +433,6 @@ function draw() {
             drawLeaderboard();
         }
 
-        drawUI()
 
         gameState.needToDraw = false;
     }
@@ -471,26 +484,13 @@ function getRotationByClick(event) {
 }
 
 function manageKeyEventFromPlayer(event) {
-    let spellInvocation: SpellInvocation = null;
-    let spell: Spell = null;
+    if (currentPlayer.onCast) return
     switch (event.key.toLowerCase()) {
         case gameSettings.player.bind.spell1:
-            spell = currentPlayer.spells.find((spell) => spell.action === SpellAction.spell1);
-            if (spell.type === SpellType.onGround) {
-                spellInvocation = new SpellInvocation(spell, convertToGameCoordinate(mouse, currentPlayer));
-            } else {
-                spellInvocation = new SpellInvocation(spell, null)
-            }
-            socket.emit("spell", spellInvocation);
+            emitSpell(SpellAction.spell1)
             break;
         case gameSettings.player.bind.spell2:
-            spell = currentPlayer.spells.find((spell) => spell.action === SpellAction.spell2);
-            if (spell.type === SpellType.onGround) {
-                spellInvocation = new SpellInvocation(spell, convertToGameCoordinate(mouse, currentPlayer));
-            } else {
-                spellInvocation = new SpellInvocation(spell, null)
-            }
-            socket.emit("spell", spellInvocation);
+            emitSpell(SpellAction.spell2)
             break;
         case gameSettings.player.bind.special:
             let spellSpecial = null;
@@ -502,27 +502,24 @@ function manageKeyEventFromPlayer(event) {
             socket.emit("special", spellSpecial);
             break;
     }
-
-    if (spellInvocation) {
-        drawSpell(spellInvocation);
-    }
 }
 
 
 function manageClickFromPlayer(event: MouseEvent) {
-    const spell: Spell = currentPlayer.basicAttackSpell;
+    emitSpell(SpellAction.basicAttack)
+}
+
+function emitSpell(spellAction: SpellAction) {
+    if (!currentPlayer) return
+
+    const spell = currentPlayer.spells.find((spell) => spell.action === spellAction);
     let spellInvocation: SpellInvocation = null;
-    if (currentPlayer.special.type === SpellType.onGround) {
+    if (spell.type === SpellType.onGround) {
         spellInvocation = new SpellInvocation(spell, convertToGameCoordinate(mouse, currentPlayer));
     } else {
-        spellInvocation = new SpellInvocation(spell, null);
+        spellInvocation = new SpellInvocation(spell, null)
     }
     socket.emit("spell", spellInvocation);
-
-    //Debug
-    if (spellInvocation) {
-        drawSpell(spellInvocation);
-    }
 }
 
 function init() {
@@ -572,13 +569,13 @@ function init() {
     });
 
     socket.on("update", (gameStateFromServer) => {
+
+
         gameState = {...gameStateFromServer};
 
-        if (gameSettings.players) {
-            currentPlayer = Object.assign(
-                {},
-                gameState.players.find((player) => player.id === currentPlayer.id)
-            );
+        const localCurrentPlayer = gameState.players.find((player) => player.id === currentPlayer.id)
+        if (gameSettings.players && localCurrentPlayer) {
+            currentPlayer = clone(localCurrentPlayer)
         }
 
         gameState.needToDraw = true;

@@ -4,13 +4,15 @@ import {SpellType} from "./SpellType";
 import {SpellAction} from "./SpellAction";
 import {Player} from "../../Player";
 import Game from "../../Game";
-import {randomId} from "../../../utils";
+import {clone, randomId} from "../../../utils";
 import Coordinate from "../Coordinate";
+
 
 export default class Spell {
     public id: string;
     public name: string;
     public description: string;
+    public time: number;
     public cooldown: number;
     public damage: number;
     public shape: Shape;
@@ -20,8 +22,11 @@ export default class Spell {
     public onCooldown: boolean;
     public onCast: boolean;
     public cooldownTime: number;
+    public castTime: number;
 
-    private _playersHit: Array<Player> = [];
+    public DplayersHit: Array<Player> = [];
+    public DspellCoordinate: Coordinate;
+    public DinitPlayerRotation: number;
 
     public constructor(
         name: string,
@@ -34,10 +39,11 @@ export default class Spell {
         type: SpellType,
         action: SpellAction,
     ) {
-        //random id
         this.id = randomId()
         this.name = name;
         this.description = description;
+
+        this.time = time;
         this.cooldown = cooldown;
         this.damage = damage;
         this.shape = shape;
@@ -46,66 +52,59 @@ export default class Spell {
         this.action = action;
 
         this.cooldownTime = 0;
+        this.castTime = 0;
         this.onCooldown = false;
         this.onCast = false;
+        this.DplayersHit = [];
+
 
     }
 
-    update() {
+    update(game, currentPlayer: Player) {
         if (this.onCooldown) {
             this.cooldownTime += 1;
             if (this.cooldownTime >= this.cooldown) {
                 this.cooldownTime = 0;
                 this.onCooldown = false;
             }
-            
+        }
+        if (this.onCast) {
+            this.castTime += 1;
+            if (this.castTime >= this.time) {
+                this.castTime = 0;
+                this.endCast(game, currentPlayer);
+            }
         }
     }
 
     cast(game: Game, currentPlayer: Player, spellCoordinate: Coordinate) {
         if (this.onCooldown || this.onCast) return;
         this.onCast = true;
-        //get players in shape
-        this._playersHit = game.players.filter((p) => {
+        this.DspellCoordinate = clone(spellCoordinate);
+        this.DinitPlayerRotation = currentPlayer.rotation
+    }
+
+    endCast(game: Game, currentPlayer: Player) {
+        //Get players in shape
+        this.DplayersHit = game.players.filter((p) => {
             if (p.id === currentPlayer.id) return false;
             if (this.type === SpellType.onCharacter) {
-                return this.shape.isInside(p.coordinate, currentPlayer.coordinate, currentPlayer.rotation);
+                return this.shape.isInside(p.coordinate, currentPlayer.coordinate, this.DinitPlayerRotation);
             } else {
-                return this.shape.isInside(p.coordinate, spellCoordinate, currentPlayer.rotation);
+                return this.shape.isInside(p.coordinate, this.DspellCoordinate, currentPlayer.rotation);
             }
         })
 
-        //Extra effect
-        switch (this.action) {
-            case SpellAction.basicAttack:
-                currentPlayer.basicAttack(this._playersHit);
-                break;
-            case SpellAction.spell1:
-                currentPlayer.firstSpell(this._playersHit);
-                break;
-            case SpellAction.spell2:
-                currentPlayer.secondSpell(this._playersHit);
-                break;
-        }
-        //Effect
-        this._playersHit.forEach((p) => {
+        //Effect on each player
+        this.DplayersHit.forEach((p) => {
             p.takeDamage(this.damage);
             this.effect.apply(p, currentPlayer);
         })
 
-        this.endCast(this._playersHit, currentPlayer, game);
-
-    }
-
-    endCast(players: Array<Player>, currentPlayer: Player, game: Game) {
-        this._playersHit.forEach((p) => {
-            this.effect.remove(p, currentPlayer);
-        })
-
         this.onCooldown = true;
         this.onCast = false;
-        this._playersHit = [];
+        this.DplayersHit = [];
+        this.DspellCoordinate = undefined;
+        this.DinitPlayerRotation = undefined;
     }
-
-
 }

@@ -50,16 +50,17 @@ export default class HeroServer {
 
     _setupSocket() {
         this.io.on("connection", (socket: Socket) => {
-            //create a new player and add it to our players array
+
             let currentPlayer: Player;
-            // Avant de commencer le client envoie des meta donnéess
+
             socket.on("init", (data) => {
                 currentPlayer = this.game.addPlayer(
                     socket.id,
                     data.window,
                     data.name.slice(0, 15)
                 );
-
+                //TODO: Use CALLBACK from socket io
+                // https://socket.io/docs/v3/emitting-events/#basic-emit
                 socket.emit("welcome", {
                     worldDimension: this.game.worldDimension,
                     currentPlayer: currentPlayer,
@@ -73,9 +74,7 @@ export default class HeroServer {
 
             socket.on("spell", (spellInvocation: SpellInvocation) => {
                 if (currentPlayer === undefined) return;
-                this.game.getSpellProfession(currentPlayer.professionType)
-                    .get(spellInvocation.spell.id)
-                    .cast(this.game, currentPlayer, spellInvocation.coordinate);
+                currentPlayer.castSpell(spellInvocation, this.game);
             });
 
             socket.on("special", (specialInvocation: SpecialInvocation) => {
@@ -96,11 +95,13 @@ export default class HeroServer {
         setInterval(() => {
             this.taskLoop.forEach((task) => task.call(this));
 
-            const payload = {
+            let payload = {
                 players: this.game.players,
             }
 
-            this.io.emit("update", removeAllPrivateProperties(payload));
+            payload = removeAllPrivateProperties(payload)
+
+            this.io.emit("update", payload);
         }, 1000 / this.tickrate);
     }
 

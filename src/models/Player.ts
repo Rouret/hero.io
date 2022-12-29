@@ -5,7 +5,7 @@ import Spell from "./utils/spells/Spell";
 import Special from "./utils/specials/Special";
 import Effect from "./utils/effects/Effect";
 import BlockEffect from "./utils/effects/BlockEffect";
-import {SpellAction} from "./utils/spells/SpellAction";
+import SpellInvocation from "./utils/spells/SpellInvocation";
 
 export enum ProfessionType {
     warrior = "warrior",
@@ -19,7 +19,6 @@ export abstract class Player {
     public speed: number;
     public size: number;
     public hp: number;
-    public basicAttackSpell: Spell;
     public spells: Array<Spell> = [];
     public special: Special;
 
@@ -30,6 +29,7 @@ export abstract class Player {
     public score: number;
     public rotation: number;
     public clientDimension: Dimension;
+    public onCast: boolean = false;
 
     protected constructor(
         id: string,
@@ -40,8 +40,6 @@ export abstract class Player {
         speed: number,
         size: number,
         window: Dimension,
-        spells: Array<Spell>,
-        special: Special
     ) {
         this.id = id;
         this.professionType = profession;
@@ -53,25 +51,25 @@ export abstract class Player {
         this.size = size;
         this.clientDimension = window;
 
-        this.spells = spells;
-        this.special = special;
-        this.basicAttackSpell = this.spells.find(spell => spell.action === SpellAction.basicAttack);
-
         this.initSpeed = this.speed;
         this.initHp = this.hp;
         this.score = 0;
         this.rotation = 0;
+        this.onCast = false;
+
+        this._registerSpells();
     }
 
     public abstract move(game: Game): Player;
 
-    public abstract basicAttack(players: Array<Player>): void;
-
-    public abstract firstSpell(players: Array<Player>): void;
-
-    public abstract secondSpell(players: Array<Player>): void;
-
-    public abstract specialSpell(players: Array<Player>): void;
+    public castSpell(spellInvocation: SpellInvocation, game: Game) {
+        if (this.onCast) return
+        const spell = this.getSpellById(spellInvocation.spell.id);
+        if (spell) {
+            this.onCast = true;
+            spell.cast(game, this, spellInvocation.coordinate);
+        }
+    }
 
     public takeDamage(damage: number): void {
         if (this.currentEffect instanceof BlockEffect) return
@@ -88,10 +86,35 @@ export abstract class Player {
     }
 
     tick(game: Game): void {
-        this.basicAttackSpell.update()
-        this.spells.forEach(spell => spell.update())
+        //Update spells
+        this.spells.forEach(spell => spell.update(game, this))
+
+        //Check if player is on cast
+        if (this.onCast) {
+            //Info: filter break the reference
+            const spellsOnCast = this.spells.filter(spell => spell.onCast)
+            //TODO SPECIAL
+
+            if (spellsOnCast.length === 0) {
+                this.onCast = false;
+            }
+        }
+
+        //Move player
         this.move(game)
     }
+
+    public getSpellById(id: string): Spell {
+        return this.spells.find(s => s.id === id);
+    }
+
+    public setSpell(spell: Spell): void {
+        const spellIndex = this.spells.findIndex(s => s.id === spell.id);
+        //no reference
+        this.spells[spellIndex] = spell;
+    }
+
+    protected abstract _registerSpells(): void;
 
     protected _defaultMove(game: Game): void {
         const newPlayerCoordinate = new Coordinate(
@@ -109,6 +132,7 @@ export abstract class Player {
         }
 
         this.coordinate = newPlayerCoordinate;
+
     }
 
 }

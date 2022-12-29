@@ -1,6 +1,7 @@
 import Spell from "./Spell";
 import Coordinate from "../Coordinate";
 
+
 export default class SpellInvocation {
     public spell: Spell;
     public coordinate: Coordinate;
@@ -9,5 +10,4 @@ export default class SpellInvocation {
         this.spell = spell;
         this.coordinate = coordinate;
     }
-
 }

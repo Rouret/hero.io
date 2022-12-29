@@ -9,9 +9,10 @@ export const randomId = function () {
 }
 
 export const removeAllPrivateProperties = function (object: any) {
+    object = clone(object);
     for (const key in object) {
         if (object.hasOwnProperty(key)) {
-            if (key.startsWith("_")) {
+            if (key.startsWith("_") || key.startsWith("D")) {
                 delete object[key];
             } else if (typeof object[key] === "object") {
                 removeAllPrivateProperties(object[key]);
@@ -22,14 +23,19 @@ export const removeAllPrivateProperties = function (object: any) {
     return object;
 }
 
+
 export const convertSecondToTick = function (second: number, tickrate: number) {
     return Math.floor(second * tickrate);
 }
 
+export function clone<T>(object: T) {
+    return <T>JSON.parse(JSON.stringify(object));
+}
 
 module.exports = {
     random,
     randomId,
     removeAllPrivateProperties,
-    convertSecondToTick
+    convertSecondToTick,
+    clone
 };
