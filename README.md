@@ -97,7 +97,13 @@ npm run dev
     - [x] Affichage de la limite du terrain
     - [x] Correction du bug de déplacement
 - [ ] V0.1.6<br>
-    - [ ] Mise en place de la première classe
+  **Cette version n'est pas jouable du faite que le webclient n'est pas encore fini.**
+    - [x] Mise en place de la première classe
+    - [x] Mise en place des spells
+    - [ ] Mise en place d'un spell spécial
+    - [ ] Respawning
+    - [ ] Documentation
+    - [ ] Supervision
 
 ### Effets et classes
 
@@ -107,6 +113,7 @@ npm run dev
 
 ## Contributeurs
 
+* [Thibault](https://github.com/joysecc)
 * [Tanguy](https://github.com/tanguymossion)
 * [Nicolas](https://github.com/nkirchhoffer)
 

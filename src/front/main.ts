@@ -1,10 +1,16 @@
 import io from "socket.io-client";
-import Bullet from "../models/Bullet";
-import Boost from "../models/Boost";
-import Player from "../models/Player";
-import Dimension from "../models/Dimension";
-import Coordinate from "../models/Coordinate";
-import {calcVector, getDistanceOfVector} from "../utils";
+import {Player} from "../models/Player";
+import Dimension from "../models/utils/Dimension";
+import Coordinate from "../models/utils/Coordinate";
+import Vector from "../models/utils/Vector";
+import SpellInvocation from "../models/utils/spells/SpellInvocation";
+import {SpellAction} from "../models/utils/spells/SpellAction";
+import {SpellType} from "../models/utils/spells/SpellType";
+import SpecialInvocation from "../models/utils/specials/SpecialInvocation";
+import SemiCircleShape from "../models/utils/shapes/SemiCircleShape";
+import CircleShape from "../models/utils/shapes/CircleShape";
+import RectangleShape from "../models/utils/shapes/RectangleShape";
+import {clone} from "../utils";
 
 const socket = io();
 
@@ -17,9 +23,7 @@ const ctx: CanvasRenderingContext2D = canvas.getContext("2d");
 //GAME SETUP
 type GameState = {
     needToDraw: boolean;
-    players: Player[];
-    bullets: Bullet[];
-    boosts: Boost[];
+    players: Player[]
 };
 let mouse = new Coordinate(0, 0);
 let frameIndex = 0;
@@ -35,9 +39,6 @@ const elName: HTMLInputElement = document.getElementById(
 const elLanding: HTMLDivElement = document.getElementById(
     "landing"
 ) as HTMLDivElement;
-const playerRunImage = document.getElementById(
-    "player_run"
-) as HTMLImageElement;
 const elButton: HTMLButtonElement = document.getElementById(
     "start"
 ) as HTMLButtonElement;
@@ -45,25 +46,20 @@ const elButton: HTMLButtonElement = document.getElementById(
 //from the server
 let gameState: GameState = {
     needToDraw: false,
-    players: [],
-    bullets: [],
-    boosts: [],
+    players: []
 };
 //local mouse position
 const gameSettings = {
     showMiniMap: true,
     showLeaderboard: false,
-    bullets: false,
     players: true,
-    boosts: false,
     limitWall: 20,
     fps: 60,
     timePerTick: 0, //calculated in init
-    BACKGROUND_COLOR: "#fff",
+    backgroundColor: "#fff",
     cheat: true,
     assets: {
-        bulletImage: document.getElementById("bullet") as HTMLImageElement,
-        gunImage: document.getElementById("gun") as HTMLImageElement
+        player: document.getElementById("player_run") as HTMLImageElement
     },
     player: {
         animation: {
@@ -74,7 +70,12 @@ const gameSettings = {
             playerRunImageFrameY: 0,
         },
         move: {
-            delay: 0//calculated in init
+            delay: 0 //calculated in init
+        },
+        bind: {
+            spell1: "a",
+            spell2: "z",
+            special: "c",
         }
     },
     minimap: {
@@ -107,6 +108,10 @@ function drawPlayer(player: Player) {
     const coefAceSpeed = Math.floor(player.speed / player.initSpeed);
     const ajustedFPS = Math.floor(gameSettings.fps / coefAceSpeed);
     const ajustedFrameIndex = frameIndex % ajustedFPS;
+    const playerCanvasCoordinate = convertToCanvasCoordinate(
+        player.coordinate,
+        currentPlayer
+    );
 
     const playerRunImageFrameIndex = Math.floor(
         (ajustedFrameIndex * (gameSettings.player.animation.playerRunImageFrame - 1)) / ajustedFPS
@@ -116,12 +121,12 @@ function drawPlayer(player: Player) {
         playerRunImageFrameIndex * gameSettings.player.animation.playerRunImageFrameWidth;
 
     ctx.save();
-    ctx.translate(player.coordinate.x, player.coordinate.y);
+    ctx.translate(playerCanvasCoordinate.x, playerCanvasCoordinate.y);
     if (Math.abs(player.rotation) > Math.PI / 2) {
         ctx.scale(-1, 1);
     }
     ctx.drawImage(
-        playerRunImage,
+        gameSettings.assets.player,
         playerRunImageFrameX,
         gameSettings.player.animation.playerRunImageFrameY,
         gameSettings.player.animation.playerRunImageFrameWidth,
@@ -131,16 +136,9 @@ function drawPlayer(player: Player) {
         player.size,
         player.size
     );
-    ctx.restore();
-
-    //draw gun
-    ctx.save();
-    ctx.translate(player.coordinate.x, player.coordinate.y);
-    ctx.rotate(player.rotation);
-    ctx.drawImage(gameSettings.assets.gunImage, -player.size / 2, -player.size / 2, 40, 20);
 
     //draw a red cirlce around the player
-    if (gameSettings.cheat) {
+    if (gameSettings.cheat && player.id === currentPlayer.id) {
         ctx.beginPath();
         ctx.arc(0, 0, 50, 0, 2 * Math.PI);
         ctx.strokeStyle = "green";
@@ -170,58 +168,39 @@ function drawPlayer(player: Player) {
 
     ctx.restore();
 
+    //Name
+    ctx.font = "20px Arial";
+    ctx.fillStyle = "black";
+    ctx.textAlign = "center";
+    ctx.fillText(player.name, playerCanvasCoordinate.x, playerCanvasCoordinate.y - player.size / 2 - 10);
+
+    //Life
+    ctx.fillStyle = "red";
+    ctx.fillRect(
+        playerCanvasCoordinate.x - player.size / 2,
+        playerCanvasCoordinate.y + player.size / 2 + 10,
+        player.size,
+        10
+    );
+    ctx.fillStyle = "green";
+    ctx.fillRect(
+        playerCanvasCoordinate.x - player.size / 2,
+        playerCanvasCoordinate.y + player.size / 2 + 10,
+        (player.size * player.hp) / player.initHp,
+        10
+    );
+    //Mouse Vector
     if (gameSettings.cheat) {
         ctx.beginPath();
-        ctx.moveTo(player.coordinate.x, player.coordinate.y);
+        const currentPlayerCanvasCoordinate = convertToCanvasCoordinate(
+            currentPlayer.coordinate,
+            currentPlayer
+        );
+        ctx.moveTo(currentPlayerCanvasCoordinate.x, currentPlayerCanvasCoordinate.y);
         ctx.lineTo(mouse.x, mouse.y);
         ctx.strokeStyle = "red";
         ctx.stroke();
     }
-
-    ctx.fillStyle = "black";
-    ctx.font = "20px Arial";
-    ctx.fillText(
-        player.name,
-        player.coordinate.x - player.name.length * 5,
-        player.coordinate.y - player.size / 2 - 10
-    );
-}
-
-function drawBullet(bullet: Bullet) {
-    console.log(bullet);
-    const currentCoordinateCanvas = convertToCanvasCoordinate(
-        bullet.current,
-        currentPlayer
-    );
-
-    const endCoordinateCanvas = convertToCanvasCoordinate(
-        bullet.end,
-        currentPlayer
-    );
-    ctx.save();
-    ctx.translate(currentCoordinateCanvas.x, currentCoordinateCanvas.y);
-    ctx.drawImage(gameSettings.assets.bulletImage, 0, 0, bullet.size, bullet.size);
-    ctx.restore();
-
-    //draw a line from the player to the bullet
-    if (gameSettings.cheat) {
-        ctx.beginPath();
-        ctx.moveTo(currentCoordinateCanvas.x, currentCoordinateCanvas.y);
-        ctx.lineTo(endCoordinateCanvas.x, endCoordinateCanvas.y);
-        ctx.strokeStyle = "red";
-        ctx.stroke();
-    }
-}
-
-function drawBoost(boost: Boost) {
-    ctx.fillStyle = boost.color;
-    const saveFillStyle = ctx.fillStyle;
-    ctx.beginPath();
-    ctx.fillStyle = boost.color;
-    ctx.arc(boost.x, boost.y, boost.size, 0, 2 * Math.PI);
-    ctx.closePath();
-    ctx.fill();
-    ctx.fillStyle = saveFillStyle;
 }
 
 function drawLeaderboard() {
@@ -239,10 +218,6 @@ function drawLeaderboard() {
 }
 
 function drawMiniMap() {
-    const miniMapPlayerSize = currentPlayer.size * gameSettings.minimap.miniMapRatio;
-    const miniMapPlayerX = currentPlayer.coordinate.x * gameSettings.minimap.miniMapRatio;
-    const miniMapPlayerY = currentPlayer.coordinate.y * gameSettings.minimap.miniMapRatio;
-
     //Mini map
     ctx.save();
     ctx.translate(canvas.width - gameSettings.minimap.miniMapSize, canvas.height - gameSettings.minimap.miniMapSize);
@@ -254,6 +229,11 @@ function drawMiniMap() {
     ctx.fillRect(gameSettings.minimap.miniMapSize - 1, 0, 1, gameSettings.minimap.miniMapSize);
     ctx.fillRect(0, gameSettings.minimap.miniMapSize - 1, gameSettings.minimap.miniMapSize, 1);
 
+    //Window and current player
+    const miniMapPlayerSize = currentPlayer.size * gameSettings.minimap.miniMapRatio;
+    const miniMapPlayerX = currentPlayer.coordinate.x * gameSettings.minimap.miniMapRatio;
+    const miniMapPlayerY = currentPlayer.coordinate.y * gameSettings.minimap.miniMapRatio;
+
     if (gameSettings.cheat) {
         ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
         ctx.fillRect(
@@ -264,13 +244,132 @@ function drawMiniMap() {
         );
     }
 
-    ctx.fillStyle = "red";
+    ctx.fillStyle = "green";
     ctx.beginPath();
     ctx.arc(miniMapPlayerX, miniMapPlayerY, miniMapPlayerSize, 0, 2 * Math.PI);
     ctx.closePath();
-
     ctx.fill();
+
+
+    if (gameSettings.cheat) {
+        gameState.players.forEach(player => {
+            if (player.id === currentPlayer.id) return
+            const miniMapPlayerX = player.coordinate.x * gameSettings.minimap.miniMapRatio;
+            const miniMapPlayerY = player.coordinate.y * gameSettings.minimap.miniMapRatio;
+
+            ctx.fillStyle = "red";
+            ctx.beginPath();
+            ctx.arc(miniMapPlayerX, miniMapPlayerY, miniMapPlayerSize, 0, 2 * Math.PI);
+            ctx.closePath();
+            ctx.fill();
+        });
+    }
+
     ctx.restore();
+}
+
+
+function drawSpell(spellInvocation: SpellInvocation) {
+    //TODO REFACTO
+    switch (spellInvocation.spell.shape.name) {
+        case "SemiCircleShape":
+            ctx.save();
+            ctx.beginPath();
+            ctx.fillStyle = "black";
+            if (spellInvocation.spell.type === SpellType.onGround) {
+                const coordinate = convertToCanvasCoordinate(spellInvocation.coordinate, currentPlayer);
+                ctx.translate(coordinate.x, coordinate.y);
+            } else {
+                const coordinate = convertToCanvasCoordinate(currentPlayer.coordinate, currentPlayer);
+                ctx.translate(coordinate.x, coordinate.y);
+            }
+            //rotate to the direction of the player
+            ctx.rotate(currentPlayer.rotation - Math.PI / 2);
+            ctx.arc(0, 0, (spellInvocation.spell.shape as SemiCircleShape).radius, 0, Math.PI);
+            ctx.fill();
+            ctx.closePath();
+            ctx.restore();
+            break;
+        case "CircleShape":
+            ctx.save();
+            ctx.beginPath();
+            ctx.fillStyle = "black";
+            if (spellInvocation.spell.type === SpellType.onGround) {
+                const coordinate = convertToCanvasCoordinate(spellInvocation.coordinate, currentPlayer);
+                ctx.translate(coordinate.x, coordinate.y);
+            } else {
+                const coordinate = convertToCanvasCoordinate(currentPlayer.coordinate, currentPlayer);
+                ctx.translate(coordinate.x, coordinate.y);
+            }
+            //rotate to the direction of the player
+            ctx.rotate(currentPlayer.rotation - Math.PI / 2);
+            ctx.arc(0, 0, (spellInvocation.spell.shape as CircleShape).radius, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.closePath();
+            ctx.restore();
+            break;
+        case "RectangleShape":
+            ctx.save();
+            ctx.beginPath();
+            ctx.fillStyle = "black";
+            if (spellInvocation.spell.type === SpellType.onGround) {
+                const coordinate = convertToCanvasCoordinate(spellInvocation.coordinate, currentPlayer);
+                ctx.translate(coordinate.x, coordinate.y);
+            } else {
+                const coordinate = convertToCanvasCoordinate(currentPlayer.coordinate, currentPlayer);
+                ctx.translate(coordinate.x, coordinate.y);
+            }
+            //rotate to the direction of the player
+            ctx.rotate(currentPlayer.rotation - Math.PI / 2);
+
+            const rectangleX = -(spellInvocation.spell.shape as RectangleShape).width / 2;
+
+            ctx.fillRect(rectangleX, 0, (spellInvocation.spell.shape as RectangleShape).width, (spellInvocation.spell.shape as RectangleShape).length);
+            ctx.fill();
+            ctx.closePath();
+            ctx.restore();
+            break;
+    }
+}
+
+function drawUI() {
+    //Draw Spells of the currentPlayer at the bottom left of the screen
+    ctx.save();
+    ctx.translate(0, canvas.height - 100);
+    ctx.fillStyle = "white";
+    ctx.fillRect(0, 0, canvas.width, 100);
+    ctx.fillStyle = "black";
+    ctx.fillRect(0, 0, canvas.width, 1);
+    ctx.fillRect(0, 0, 1, 100);
+    ctx.fillRect(canvas.width - 1, 0, 1, 100);
+    ctx.fillRect(0, 100 - 1, canvas.width, 1);
+    ctx.restore();
+
+    for (let i = 0; i < currentPlayer.spells.length; i++) {
+        ctx.save();
+        ctx.translate(0, canvas.height - 100);
+        ctx.translate(10 + i * 100, 10);
+        if (currentPlayer.onCast) {
+            if (currentPlayer.spells[i].onCast) {
+                //Spell is onCast
+                ctx.fillStyle = "blue";
+            } else {
+                //Can't the other spells
+                ctx.fillStyle = "orange";
+            }
+        } else {
+            //Cooldown
+            ctx.fillStyle = currentPlayer.spells[i].onCooldown ? "red" : "green";
+        }
+
+        ctx.fillRect(0, 0, 80, 80);
+        ctx.fillStyle = "black";
+        ctx.fillRect(0, 0, 80, 1);
+        ctx.fillRect(0, 0, 1, 80);
+        ctx.fillRect(80 - 1, 0, 1, 80);
+        ctx.fillRect(0, 80 - 1, 80, 1);
+        ctx.restore();
+    }
 }
 
 function drawMap() {
@@ -314,7 +413,7 @@ function draw() {
         // clear canvas
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         // draw background
-        ctx.fillStyle = gameSettings.BACKGROUND_COLOR;
+        ctx.fillStyle = gameSettings.backgroundColor;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         // draw players
@@ -322,17 +421,9 @@ function draw() {
             gameState.players.forEach(drawPlayer);
         }
 
-        //draw bullets
-        if (gameSettings.bullets) {
-            gameState.bullets.forEach(drawBullet);
-        }
-
-        //draw boosts if gameSettings.boosts is true
-        if (gameSettings.boosts) {
-            gameState.boosts.forEach(drawBoost);
-        }
-
         drawMap();
+
+        drawUI();
 
         if (gameSettings.showMiniMap) {
             drawMiniMap();
@@ -341,6 +432,7 @@ function draw() {
         if (gameSettings.showLeaderboard) {
             drawLeaderboard();
         }
+
 
         gameState.needToDraw = false;
     }
@@ -376,19 +468,58 @@ function getRotationByClick(event) {
         currentPlayer
     );
 
-    const vector = calcVector(
-        currentPlayer.coordinate.x,
-        currentPlayer.coordinate.y,
-        mouseWorldCoordinate.x,
-        mouseWorldCoordinate.y
+    const vector = Vector.factoryWithPoint(
+        currentPlayer.coordinate,
+        mouseWorldCoordinate
     );
 
-    let rotation = Math.acos(vector.x / getDistanceOfVector(vector));
-    if (vector.y > 0) {
-        rotation = -rotation;
+    let rotation = vector.getAngle();
+
+    if (rotation < 0) {
+        rotation = 2 * Math.PI + rotation;
     }
 
+
     return rotation;
+}
+
+function manageKeyEventFromPlayer(event) {
+    if (currentPlayer.onCast) return
+    switch (event.key.toLowerCase()) {
+        case gameSettings.player.bind.spell1:
+            emitSpell(SpellAction.spell1)
+            break;
+        case gameSettings.player.bind.spell2:
+            emitSpell(SpellAction.spell2)
+            break;
+        case gameSettings.player.bind.special:
+            let spellSpecial = null;
+            if (currentPlayer.special.type === SpellType.onGround) {
+                spellSpecial = new SpecialInvocation(currentPlayer.special, convertToGameCoordinate(mouse, currentPlayer), currentPlayer);
+            } else {
+                spellSpecial = new SpecialInvocation(currentPlayer.special, null, currentPlayer)
+            }
+            socket.emit("special", spellSpecial);
+            break;
+    }
+}
+
+
+function manageClickFromPlayer(event: MouseEvent) {
+    emitSpell(SpellAction.basicAttack)
+}
+
+function emitSpell(spellAction: SpellAction) {
+    if (!currentPlayer) return
+
+    const spell = currentPlayer.spells.find((spell) => spell.action === spellAction);
+    let spellInvocation: SpellInvocation = null;
+    if (spell.type === SpellType.onGround) {
+        spellInvocation = new SpellInvocation(spell, convertToGameCoordinate(mouse, currentPlayer));
+    } else {
+        spellInvocation = new SpellInvocation(spell, null)
+    }
+    socket.emit("spell", spellInvocation);
 }
 
 function init() {
@@ -414,23 +545,14 @@ function init() {
             },
             false
         );
-    }
 
-    //Shoot Event
-    if (gameSettings.bullets) {
-        document.addEventListener("keyup", (event) => {
-            if (event.key === " ") {
-                socket.emit("shoot", {x: mouse.x, y: mouse.y});
-            }
-        });
+        document.addEventListener(
+            "keypress",
+            manageKeyEventFromPlayer);
 
-        canvas.addEventListener(
+        document.addEventListener(
             "click",
-            function (event) {
-                socket.emit("shoot", getRotationByClick(event));
-            },
-            false
-        );
+            manageClickFromPlayer);
     }
 
     //IO
@@ -447,30 +569,13 @@ function init() {
     });
 
     socket.on("update", (gameStateFromServer) => {
+
+
         gameState = {...gameStateFromServer};
 
-        if (gameSettings.players) {
-            currentPlayer = Object.assign(
-                {},
-                gameState.players.find((player) => player.id === currentPlayer.id)
-            );
-
-            gameState.players.map((player) => {
-                player.coordinate = convertToCanvasCoordinate(
-                    player.coordinate,
-                    currentPlayer
-                );
-
-                return player;
-            });
-        }
-
-        if (gameSettings.bullets) {
-            gameState.bullets.map((bullet) => {
-                bullet.current = convertToCanvasCoordinate(bullet.current, currentPlayer);
-                bullet.end = convertToCanvasCoordinate(bullet.end, currentPlayer); //only for cheat
-                return bullet;
-            });
+        const localCurrentPlayer = gameState.players.find((player) => player.id === currentPlayer.id)
+        if (gameSettings.players && localCurrentPlayer) {
+            currentPlayer = clone(localCurrentPlayer)
         }
 
         gameState.needToDraw = true;

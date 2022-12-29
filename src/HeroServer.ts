@@ -3,9 +3,11 @@ import path from "path";
 import http from "http";
 import {Server, Socket} from "socket.io";
 import Game from "./models/Game";
-import {calcVector, getDistanceOfVector, random,} from "./utils";
-import Coordinate from "./models/Coordinate";
-import Player from "./models/Player";
+import {Player} from "./models/Player";
+import SpellInvocation from "./models/utils/spells/SpellInvocation";
+import SpecialInvocation from "./models/utils/specials/SpecialInvocation";
+import Dimension from "./models/utils/Dimension";
+import {removeAllPrivateProperties} from "./utils";
 
 export default class HeroServer {
     app: express.Application;
@@ -16,81 +18,26 @@ export default class HeroServer {
     publicFolder: string;
     viewsFolder: string;
     tickrate: number;
-    boostInterval: number;
     taskLoop: Array<() => void>;
-    _boostTimer: number;
 
     constructor() {
         this.app = express();
         this.server = http.createServer(this.app);
         this.io = new Server(this.server);
-        this.game = new Game();
         this.port = 3000;
         this.publicFolder = "../dist";
         this.viewsFolder = "../views";
         this.tickrate = 60;
-        this.boostInterval = this.tickrate;
-        this._boostTimer = 0;
-        this.taskLoop = [this._loopBullets, this._loopPlayers, this._loopBoosts];
-    }
-
-    _loopBullets() {
-        this.game.filterBullet();
-        if (this.game.players.length === 0) return;
-        this.game.bullets.forEach((bullet) => {
-            const vector = calcVector(
-                bullet.current.x,
-                bullet.current.y,
-                bullet.end.x,
-                bullet.end.y
-            );
-            const distance = getDistanceOfVector(vector);
-
-            const coef = distance / bullet.speed;
-            if (coef > 1) {
-                bullet.current.x += vector.x / coef;
-                bullet.current.y += vector.y / coef;
-            } else {
-                bullet.current.x = bullet.end.x;
-                bullet.current.y = bullet.end.y;
-                bullet.isAlive = false;
-            }
-        });
+        this.game = new Game(this.tickrate);
+        this.taskLoop = [this._loopPlayers];
     }
 
     _loopPlayers() {
-        this.game.players.forEach((player) => {
-            const bulletCollided = player.isCollidingWith(this.game.bullets);
-            if (bulletCollided !== null) {
-                const playerId = bulletCollided.player.id;
-
-                this.game.players.find((p) => p.id !== playerId).score++;
-
-                const playerCoordinate = new Coordinate(
-                    random(0, this.game.worldDimension.width),
-                    random(0, this.game.worldDimension.height)
-                );
-                player.coordinate = playerCoordinate;
-                player.removeEffect();
-            }
-            const boostCollided = player.isCollidingWithBoost(this.game.boosts);
-            if (boostCollided !== null) {
-                player.setEffect(boostCollided);
-                this.game.boosts = this.game.boosts.filter(
-                    (b) => b.id !== boostCollided.id
-                );
-            }
-        });
-    }
-
-    _loopBoosts() {
-        // Generate boosts
-        // this._boostTimer++;
-        // if (this._boostTimer >= this.boostInterval) {
-        //   const randomPos = randomPosOnScreen(this.game.players);
-        //   this.game.addBoost(randomPos);
-        //   this._boostTimer = 0;
-        // }
+        this.game.players = this.game.players.map((p) => {
+            if (p.id === "test") return p
+            p.tick(this.game);
+            return p
+        })
     }
 
     _setupExpress() {
@@ -103,47 +50,36 @@ export default class HeroServer {
 
     _setupSocket() {
         this.io.on("connection", (socket: Socket) => {
-            //create a new player and add it to our players array
+
             let currentPlayer: Player;
-            // Avant de commencer le client envoie des meta donnéess
+
             socket.on("init", (data) => {
                 currentPlayer = this.game.addPlayer(
                     socket.id,
                     data.window,
                     data.name.slice(0, 15)
                 );
-
+                //TODO: Use CALLBACK from socket io
+                // https://socket.io/docs/v3/emitting-events/#basic-emit
                 socket.emit("welcome", {
                     worldDimension: this.game.worldDimension,
                     currentPlayer: currentPlayer,
                 });
             });
 
-            //send the players object to the new player
-            this.io.emit("update", {players: this.game.players});
-
             socket.on("moving", (rotation) => {
                 if (currentPlayer === undefined) return;
                 currentPlayer.rotation = rotation;
             });
 
-            socket.on("shoot", (rotation: number) => {
+            socket.on("spell", (spellInvocation: SpellInvocation) => {
                 if (currentPlayer === undefined) return;
-                const bulletCoordinate = new Coordinate(
-                    currentPlayer.coordinate.x + Math.cos(rotation),
-                    currentPlayer.coordinate.y - Math.sin(rotation)
-                );
+                currentPlayer.castSpell(spellInvocation, this.game);
+            });
 
-                if (
-                    bulletCoordinate.x < 0 ||
-                    bulletCoordinate.x > this.game.worldDimension.width ||
-                    bulletCoordinate.y < 0 ||
-                    bulletCoordinate.y > this.game.worldDimension.height
-                ) {
-                    return;
-                }
-
-                this.game.addBullet(currentPlayer.coordinate, bulletCoordinate, currentPlayer);
+            socket.on("special", (specialInvocation: SpecialInvocation) => {
+                if (currentPlayer === undefined) return;
+                console.log("special:", specialInvocation.special.name);
             });
 
             socket.on("disconnect", () => {
@@ -159,17 +95,13 @@ export default class HeroServer {
         setInterval(() => {
             this.taskLoop.forEach((task) => task.call(this));
 
-            const playersToSend = this.game.players
-                .map((p) => {
-                    p.move(this.game)
-                    return p;
-                })
+            let payload = {
+                players: this.game.players,
+            }
 
-            this.io.emit("update", {
-                players: playersToSend,
-                bullets: this.game.bullets,
-                boosts: this.game.boosts,
-            });
+            payload = removeAllPrivateProperties(payload)
+
+            this.io.emit("update", payload);
         }, 1000 / this.tickrate);
     }
 
@@ -179,6 +111,8 @@ export default class HeroServer {
         this._setupSocket();
 
         this._startGameLoop();
+
+        this.game.addPlayer("test", new Dimension(1000, 1000), "test");
 
         this.server.listen(this.port, () => {
             console.log(`listening on *:${this.port}`);
