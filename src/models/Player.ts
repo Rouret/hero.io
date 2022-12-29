@@ -29,7 +29,7 @@ export abstract class Player {
     public score: number;
     public rotation: number;
     public clientDimension: Dimension;
-    public onCast: boolean = false;
+    public onCast = false;
 
     protected constructor(
         id: string,

@@ -10,6 +10,7 @@ export default class CircleShape implements Shape {
         this.radius = radius;
     }
 
+    /* eslint-disable @typescript-eslint/no-unused-vars */
     isInside(objectCoordinate: Coordinate,
              playerCoordinate: Coordinate,
              playerAngle: number): boolean {

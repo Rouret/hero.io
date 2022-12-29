@@ -24,9 +24,8 @@ export default class Spell {
     public cooldownTime: number;
     public castTime: number;
 
-    public DplayersHit: Array<Player> = [];
-    public DspellCoordinate: Coordinate;
-    public DinitPlayerRotation: number;
+    public _spellCoordinate: Coordinate;
+    public _initPlayerRotation: number;
 
     public constructor(
         name: string,
@@ -55,8 +54,6 @@ export default class Spell {
         this.castTime = 0;
         this.onCooldown = false;
         this.onCast = false;
-        this.DplayersHit = [];
-
 
     }
 
@@ -80,31 +77,30 @@ export default class Spell {
     cast(game: Game, currentPlayer: Player, spellCoordinate: Coordinate) {
         if (this.onCooldown || this.onCast) return;
         this.onCast = true;
-        this.DspellCoordinate = clone(spellCoordinate);
-        this.DinitPlayerRotation = currentPlayer.rotation
+        this._spellCoordinate = clone(spellCoordinate);
+        this._initPlayerRotation = currentPlayer.rotation
     }
 
     endCast(game: Game, currentPlayer: Player) {
         //Get players in shape
-        this.DplayersHit = game.players.filter((p) => {
+        const playersHit = game.players.filter((p) => {
             if (p.id === currentPlayer.id) return false;
             if (this.type === SpellType.onCharacter) {
-                return this.shape.isInside(p.coordinate, currentPlayer.coordinate, this.DinitPlayerRotation);
+                return this.shape.isInside(p.coordinate, currentPlayer.coordinate, this._initPlayerRotation);
             } else {
-                return this.shape.isInside(p.coordinate, this.DspellCoordinate, currentPlayer.rotation);
+                return this.shape.isInside(p.coordinate, this._spellCoordinate, currentPlayer.rotation);
             }
         })
 
         //Effect on each player
-        this.DplayersHit.forEach((p) => {
+        playersHit.forEach((p) => {
             p.takeDamage(this.damage);
             this.effect.apply(p, currentPlayer);
         })
 
         this.onCooldown = true;
         this.onCast = false;
-        this.DplayersHit = [];
-        this.DspellCoordinate = undefined;
-        this.DinitPlayerRotation = undefined;
+        this._spellCoordinate = undefined;
+        this._initPlayerRotation = undefined;
     }
 }

@@ -22,6 +22,7 @@ export class PushBackEffect extends Effect {
         player.coordinate.y += Math.sin(angle) * this.pushBackType;
     }
 
+    /* eslint-disable @typescript-eslint/no-unused-vars */
     remove(player: Player, currentPlayer: Player): void {
         // Nothing to do
     }

@@ -28,6 +28,7 @@ export class HealEffect extends Effect {
         }
     }
 
+    /* eslint-disable @typescript-eslint/no-unused-vars */
     remove(player: Player, currentPlayer: Player): void {
         //nothing to do
     }
