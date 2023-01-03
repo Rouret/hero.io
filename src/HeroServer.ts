@@ -100,6 +100,7 @@ export default class HeroServer {
             }
 
             payload = removeAllPrivateProperties(payload)
+            
 
             this.io.emit("update", payload);
         }, 1000 / this.tickrate);

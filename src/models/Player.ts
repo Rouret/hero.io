@@ -22,6 +22,7 @@ export abstract class Player {
     public spells: Array<Spell> = [];
     public special: Special;
 
+    public currentSpellInvocation: SpellInvocation;
     public currentEffect: Effect = null;
     public coordinate: Coordinate;
     public initSpeed: number;
@@ -65,11 +66,15 @@ export abstract class Player {
 
     public castSpell(spellInvocation: SpellInvocation, game: Game) {
         if (this.onCast) return
+
         const spell = this.getSpellById(spellInvocation.spell.id);
         if (spell) {
             this.onCast = true;
             spell.cast(game, this, spellInvocation.coordinate);
         }
+
+        spellInvocation.spell = spell; //To have the init rotation of the player
+        this.currentSpellInvocation = spellInvocation;
     }
 
     public castSpecial(specialInvocation, game: Game): void {
@@ -97,11 +102,12 @@ export abstract class Player {
         //Check if player is on cast
         if (this.onCast) {
             //Info: filter break the reference
-            const spellsOnCast = this.spells.filter(spell => spell.onCast)
+            const isOnCast = this.spells.find(spell => spell.onCast)
             //TODO SPECIAL
 
-            if (spellsOnCast.length === 0) {
+            if (!isOnCast) {
                 this.onCast = false;
+                this.currentSpellInvocation = null;
             }
         }
 

@@ -23,9 +23,8 @@ export default class Spell {
     public onCast: boolean;
     public cooldownTime: number;
     public castTime: number;
-
-    public _spellCoordinate: Coordinate;
-    public _initPlayerRotation: number;
+    public initPlayerRotation: number;
+    private _spellCoordinate: Coordinate;
 
     public constructor(
         name: string,
@@ -78,7 +77,7 @@ export default class Spell {
         return game.players.filter((p) => {
             if (p.id === currentPlayer.id) return false;
             if (this.type === SpellType.onCharacter) {
-                return this.shape.isInside(p.coordinate, currentPlayer.coordinate, this._initPlayerRotation);
+                return this.shape.isInside(p.coordinate, currentPlayer.coordinate, this.initPlayerRotation);
             } else {
                 return this.shape.isInside(p.coordinate, this._spellCoordinate, currentPlayer.rotation);
             }
@@ -106,7 +105,7 @@ export default class Spell {
         }
 
         this._spellCoordinate = clone(spellCoordinate);
-        this._initPlayerRotation = currentPlayer.rotation
+        this.initPlayerRotation = currentPlayer.rotation
     }
 
     endCast(game: Game, currentPlayer: Player) {
@@ -126,6 +125,6 @@ export default class Spell {
         this.onCooldown = true;
         this.onCast = false;
         this._spellCoordinate = undefined;
-        this._initPlayerRotation = undefined;
+        this.initPlayerRotation = undefined;
     }
 }
